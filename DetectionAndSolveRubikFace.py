@@ -38,6 +38,10 @@ def drawDetectedFace(img, face):
         (x, y, radius,   color) = piece
        # radius = piece.get('radius')
        # cv2.circle(img,(x,y), radius, (0,0,255), 2)
+        color2 = getColorName(img,x,y)
+        h,s,v=img[y,x]
+        texto = "h="+str(h)+" s="+str(s)+" v="+str(v)+" color="+color2
+        print(texto)
         cv2.putText(img,color,(x,y),cv2.FONT_HERSHEY_SIMPLEX,1,(50,50,255),2)
        # print(color,end='')
        # print('')
@@ -207,9 +211,12 @@ cv2.createTrackbar("Area","Parameters",15000,80000,empty)
 #mask = np.zeros(image.shape, dtype=np.uint8)
 
 colors = {
-    'b': ([79, 50, 70], [171, 255, 255]),    # Blue
-    'g': ([39, 80, 100], [78, 255, 255]),    # Green
-    'y': ([17, 25, 117], [38, 255, 255]),   # Yellow
+    'b': ([79, 50, 56], [171, 255, 255]),    # Blue
+    'g1': ([40, 80,95], [78, 255, 255]),    # Green
+    'g2': ([6, 80, 100], [7, 255, 102]),    # Green
+    'g3': ([125,7, 105], [127, 8, 109]),    # Green
+    'g4': ([168,31, 63], [169, 32, 65]),    # Green
+    'y': ([17, 25, 117], [39, 255, 255]),   # Yellow
     'o1': ([2, 80, 125], [16, 255, 255]),     # Orange
     'o2': ([0, 80, 125], [16, 160, 255]),     # Orange
     'r1': ([0, 90, 20], [2, 255, 255]),     # Red
@@ -235,7 +242,7 @@ while True:
     eroded = erodeFrame(dilated)
     face = findsCandidateEdges(eroded,frameHSV,face)
 
-    frame = drawDetectedFace(frame, face)
+    frame = drawDetectedFace(frameHSV, face)
     cv2.imshow('frame',frame)
     if cv2.waitKey(1) & 0xFF == ord('s'):
         if (len(face) == 9):
