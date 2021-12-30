@@ -32,7 +32,7 @@ def getColorName(img,x,y):
    # print("h={}, s={}, v={}, color={} ".format(h,s,v,color))
     return color
     
-def drawDetectedFace(img, face):
+def debugDetectedFace(img, face):
     for piece in face:
         #cnts.append(component.get('contour'))
         (x, y, radius,   color) = piece
@@ -42,6 +42,20 @@ def drawDetectedFace(img, face):
         h,s,v=img[y,x]
         texto = "h="+str(h)+" s="+str(s)+" v="+str(v)+" color="+color2
         print(texto)
+       # print(color,end='')
+       # print('')
+   #cv2.drawContours(img, face.get('contour'), -1, (0, 0, 255), 3)   
+    
+def drawDetectedFace(img, face):
+    for piece in face:
+        #cnts.append(component.get('contour'))
+        (x, y, radius,   color) = piece
+       # radius = piece.get('radius')
+       # cv2.circle(img,(x,y), radius, (0,0,255), 2)
+        #color2 = getColorName(img,x,y)
+       # h,s,v=img[y,x]
+        #texto = "h="+str(h)+" s="+str(s)+" v="+str(v)+" color="+color2
+       # print(texto)
         cv2.putText(img,color,(x,y),cv2.FONT_HERSHEY_SIMPLEX,1,(50,50,255),2)
        # print(color,end='')
        # print('')
@@ -212,11 +226,11 @@ cv2.createTrackbar("Area","Parameters",15000,80000,empty)
 
 colors = {
     'b': ([79, 50, 56], [171, 255, 255]),    # Blue
-    'g1': ([40, 80,95], [78, 255, 255]),    # Green
+    'g1': ([40, 80,94], [78, 255, 255]),    # Green
     'g2': ([6, 80, 100], [7, 255, 102]),    # Green
     'g3': ([125,7, 105], [127, 8, 109]),    # Green
-    'g4': ([168,31, 63], [169, 32, 65]),    # Green
-    'y': ([17, 25, 117], [39, 255, 255]),   # Yellow
+    'g4': ([81,14, 55], [170, 32, 65]),    # Green
+    'y': ([17, 25, 114], [39, 255, 255]),   # Yellow
     'o1': ([2, 80, 125], [16, 255, 255]),     # Orange
     'o2': ([0, 80, 125], [16, 160, 255]),     # Orange
     'r1': ([0, 90, 20], [2, 255, 255]),     # Red
@@ -241,8 +255,8 @@ while True:
     dilated = lineexpandFrame(canny)
     eroded = erodeFrame(dilated)
     face = findsCandidateEdges(eroded,frameHSV,face)
-
-    frame = drawDetectedFace(frameHSV, face)
+    debugDetectedFace(frameHSV, face)
+    frame = drawDetectedFace(frame, face)
     cv2.imshow('frame',frame)
     if cv2.waitKey(1) & 0xFF == ord('s'):
         if (len(face) == 9):
