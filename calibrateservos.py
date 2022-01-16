@@ -35,6 +35,28 @@ print(servo_offset)
 # Set frequency to 60[Hz]
 pwm.set_pwm_freq(60)
 
+moveForward(leftwristservo,0)
+time.sleep(1)
+moveForward(leftwristservo,90)
+time.sleep(1)
+moveForward(leftwristservo,180)
+time.sleep(1)
+moveForward(leftwristservo,90)
+time.sleep(1)
+moveForward(leftwristservo,0)
+time.sleep(1)
+
+moveForward(rightwristservo,0)
+time.sleep(1)
+moveForward(rightwristservo,90)
+time.sleep(1)
+moveForward(rightwristservo,180)
+time.sleep(1)
+moveForward(rightwristservo,90)
+time.sleep(1)
+moveForward(rightwristservo,0)
+time.sleep(1)
+
 moveForward(leftgripservo,0)
 for i in range(45):
 	moveForward(leftgripservo,i)
@@ -58,30 +80,7 @@ while True:
     moveForward(rightgripservo,0)   
 
 
-""""
-moveForward(leftwristservo,0)
-time.sleep(1)
-moveForward(leftwristservo,90)
-time.sleep(1)
-moveForward(leftwristservo,180)
-time.sleep(1)
-moveForward(leftwristservo,90)
-time.sleep(1)
-moveForward(leftwristservo,0)
-time.sleep(1)
 
-moveForward(rightwristservo,0)
-time.sleep(1)
-moveForward(rightwristservo,90)
-time.sleep(1)
-moveForward(rightwristservo,180)
-time.sleep(1)
-moveForward(rightwristservo,90)
-time.sleep(1)
-moveForward(rightwristservo,0)
-time.sleep(1)
-
-"""
 """
 moveForward(leftgripservo,0)
 time.sleep(5)
