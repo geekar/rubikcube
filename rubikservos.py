@@ -3,9 +3,14 @@
 
 import Adafruit_PCA9685
 import time
+import RPi.GPIO as GPIO
 
 # Initialise the PCA9685 using desired address and/or bus:
 pwm = Adafruit_PCA9685.PCA9685(address = 0x40, busnum = 1)
+# Initialise the GPIO to use push buttons
+GPIO.setmode(GPIO.BOARD)
+startButton=15
+GPIO.setup(startButton, GPIO.IN)
 
 
 def offset(grados):
@@ -78,6 +83,26 @@ def rotateCubeToRight():
     moveForward(rightwristservo,0)
     closeRightGrip()
     
+def start():
+    print("Starting cube detection")
+    openGrips()
+    closeGrips()
+
+def stop():
+    print("Stop cube detection")
+    openGrips()
+  
+while True:
+    startValue= GPIO.input(startButton)
+    if (startValue== 0):
+        start()
+    else: 
+        stop()
+    
+ 
+GPIO.cleanup(startButton)
+ 
 openGrips()
 closeGrips()
 rotateCubeToRight()
+
