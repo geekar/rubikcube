@@ -4,6 +4,10 @@
 import Adafruit_PCA9685
 import time
 import RPi.GPIO as GPIO
+import Adafruit_SSD1306
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
 
 # Initialise the PCA9685 using desired address and/or bus:
 pwm = Adafruit_PCA9685.PCA9685(address = 0x40, busnum = 1)
@@ -11,6 +15,16 @@ pwm = Adafruit_PCA9685.PCA9685(address = 0x40, busnum = 1)
 GPIO.setmode(GPIO.BOARD)
 startButton=15
 GPIO.setup(startButton, GPIO.IN)
+
+#Initialize display 128x64
+RST= None
+SCL=32
+SDA=31
+disp=Adafruit_SSD1306.SSD1306_128_64(rst=RST, i2c_bus=1, gpio=1)
+disp.begin()
+disp.clear()
+disp.display()
+
 
 
 def offset(grados):
@@ -91,11 +105,40 @@ def start():
 def stop():
     print("Stop cube detection")
     openGrips()
-  
+    
+def drawInit():
+    width=disp .width
+    height=disp.height
+    image=Image.new('1', (width, height))
+    draw=ImageDraw.Draw(image)
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    padding=-2
+    top=padding
+    bottom=height-padding
+    return draw,  image
+
+def drawText(str, draw, image):
+    width=disp .width
+    height=disp.height
+    padding=-2
+    top=padding
+    x=0
+    font=ImageFont.load_default()
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    draw.text((x, top), str, font=font,  fill=255)
+    disp.image(image)
+    disp.display()
+    time.sleep(.1)
+ 
+draw, image = drawInit() 
 while True:
     startValue= GPIO.input(startButton)
+    drawText("hola", draw, image)
     if (startValue== 0):
         start()
+        drawText("adios", draw, image)
+        GPIO.cleanup(startButton)
+        exit()
     else: 
         stop()
     
