@@ -1,0 +1,3 @@
+# rubikcube
+
+Install OpenCV 
