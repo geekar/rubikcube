@@ -6,3 +6,7 @@ Install OpenCV
     
 Install rubik-solver
    * https://pypi.org/project/rubik-solver/
+
+Configure I2C
+
+   * https://learn.adafruit.com/adafruits-raspberry-pi-lesson-4-gpio-setup/configuring-i2c
