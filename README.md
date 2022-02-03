@@ -14,3 +14,7 @@ Configure I2C
 Install Adafruit-pca9685
 
    * https://github.com/adafruit/Adafruit_Python_PCA9685/
+
+Install Adafruit-SSD1306
+
+   * https://github.com/adafruit/Adafruit_Python_SSD1306
