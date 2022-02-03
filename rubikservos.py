@@ -13,7 +13,9 @@ from PIL import ImageFont
 pwm = Adafruit_PCA9685.PCA9685(address = 0x40, busnum = 1)
 # Initialise the GPIO to use push buttons
 GPIO.setmode(GPIO.BOARD)
-startButton=15
+# jetson nano startButton=15
+
+startButton=16
 GPIO.setup(startButton, GPIO.IN)
 
 #Initialize display 128x64

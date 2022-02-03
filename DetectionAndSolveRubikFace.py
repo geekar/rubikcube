@@ -206,8 +206,8 @@ def findsCandidateEdges(img,imgHSV,face):
 def empty(a):
     pass
 
-#cap = cv2.VideoCapture(1)
-cap = cv2.VideoCapture("nvarguscamerasrc ! video/x-raw(memory:NVMM), width=(int)1280, height=(int)960,format=(string)NV12, framerate=(fraction)30/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert !  appsink")
+cap = cv2.VideoCapture(0)
+# Jetson nano cap = cv2.VideoCapture("nvarguscamerasrc ! video/x-raw(memory:NVMM), width=(int)1280, height=(int)960,format=(string)NV12, framerate=(fraction)30/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert !  appsink")
 cap.set(3, 640)
 cap.set(4, 480)
 
@@ -225,14 +225,14 @@ cv2.createTrackbar("Area","Parameters",15000,80000,empty)
 #mask = np.zeros(image.shape, dtype=np.uint8)
 
 colors = {
-    'b': ([79, 50, 56], [171, 255, 255]),    # Blue
+    'b': ([79, 55, 56], [171, 255, 255]),    # Blue
     'g1': ([40, 80,94], [78, 255, 255]),    # Green
     'g2': ([6, 80, 100], [7, 255, 102]),    # Green
     'g3': ([125,7, 105], [127, 8, 109]),    # Green
     'g4': ([81,14, 55], [170, 32, 65]),    # Green
     'y': ([17, 25, 114], [39, 255, 255]),   # Yellow
     'o1': ([2, 80, 125], [16, 255, 255]),     # Orange
-    'o2': ([0, 80, 125], [16, 160, 255]),     # Orange
+    'o2': ([0, 80, 125], [16, 190, 255]),     # Orange
     'r1': ([0, 90, 20], [2, 255, 255]),     # Red
     'r2': ([1, 161, 20], [1, 255, 255]),     # Red
     'r3': ([172, 100, 20], [180, 255, 255]),     # Red  
