@@ -10,3 +10,7 @@ Install rubik-solver
 Configure I2C
 
    * https://learn.adafruit.com/adafruits-raspberry-pi-lesson-4-gpio-setup/configuring-i2c
+
+Install Adafruit-pca9685
+
+   * https://github.com/adafruit/Adafruit_Python_PCA9685/
