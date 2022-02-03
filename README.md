@@ -18,3 +18,8 @@ Install Adafruit-pca9685
 Install Adafruit-SSD1306
 
    * https://github.com/adafruit/Adafruit_Python_SSD1306
+
+Raspberry Pi 4 GPIO Pinout and GPIO
+
+   * https://www.etechnophiles.com/raspberry-pi-4-gpio-pinout-specifications-and-schematic/
+   * https://raspberrypihq.com/use-a-push-button-with-raspberry-pi-gpio/
