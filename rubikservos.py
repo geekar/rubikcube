@@ -27,6 +27,9 @@ disp.begin()
 disp.clear()
 disp.display()
 
+leftgripclosed = False
+rightgripclosed = False
+
 
 
 def offset(grados):
@@ -58,24 +61,36 @@ def moveBackward(servo,grados):
 
 ## GRIP CORE SERVO FUNCTIONS
 def openLeftGrip():
-    for i in range(45):
-        moveForward(leftgripservo,i)
-        time.sleep(0.03)
+    global leftgripclosed
+    if leftgripclosed:
+        for i in range(35):
+            moveForward(leftgripservo,i)
+            time.sleep(0.03)
+        leftgripclosed = False
  
 def closeLeftGrip():
-    for i in range(45):
-        moveForward(leftgripservo,45-i)
-        time.sleep(0.03) 
+    global leftgripclosed
+    if not leftgripclosed:
+        for i in range(35):
+            moveForward(leftgripservo,35-i)
+            time.sleep(0.03)
+        leftgripclosed = True    
 
 def openRightGrip():
-    for i in range(35):
-        moveForward(rightgripservo,i)
-        time.sleep(0.03)
+    global rightgripclosed
+    if rightgripclosed:    
+        for i in range(35):
+            moveForward(rightgripservo,i)
+            time.sleep(0.03)
+        rightgripclosed = False    
         
 def closeRightGrip():
-    for i in range(35):
-        moveForward(rightgripservo,35-i)
-        time.sleep(0.03)        
+    global rightgripclosed
+    if not rightgripclosed:    
+        for i in range(35):
+            moveForward(rightgripservo,35-i)
+            time.sleep(0.03)
+        rightgripclosed = True
         
 ##  RUBIK ROBOT MOVEMENT FUNCTIONS    
 def openGrips():
@@ -101,7 +116,7 @@ def rotateCubeToRight():
     
 def start():
     print("Starting cube detection")
-    openGrips()
+    #openGrips()
     closeGrips()
 
 def stop():
@@ -132,17 +147,18 @@ def drawText(str, draw, image):
     disp.display()
     time.sleep(.1)
  
-draw, image = drawInit() 
+draw, image = drawInit()
+openGrips()
 while True:
     startValue= GPIO.input(startButton)
     drawText("hola", draw, image)
     if (startValue== 0):
-        start()
+        stop()
         drawText("adios", draw, image)
         GPIO.cleanup(startButton)
         exit()
     else: 
-        stop()
+        start()
     
  
 GPIO.cleanup(startButton)
