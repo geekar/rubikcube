@@ -29,11 +29,16 @@ disp.display()
 
 leftgripclosed = False
 rightgripclosed = False
+leftwristturned = False
+leftwristcenter = False
 
 
 
 def offset(grados):
 	return (round ((servo_max - servo_min) * grados / 180))
+
+def offsetgrip(grados):
+	return (round ((servo_max_grip - servo_min_grip) * grados / 180))
 
 
 
@@ -46,7 +51,9 @@ rightgripservo = 3
 
 # Configure min and max servo pulse lengths
 servo_min    = 132 # min. pulse length - 0
-servo_max    = 635 # max. pulse length -180#
+servo_max    = 650 # max. pulse length -180#
+servo_min_grip    = 132 # min. pulse length - 0
+servo_max_grip    = 700 # max. pulse length -180#
 #servo_max    = 1270 # max. pulse length -180#
 #servo_offset = 251 # 90
 # Set frequency to 60[Hz]
@@ -54,48 +61,82 @@ pwm.set_pwm_freq(60)
 
 ## WRIST CORE SERVO FUNCTIONS
 def moveForward(servo,grados):
-	return pwm.set_pwm(servo, 0, servo_min+offset(grados))
+    print(servo_min+offset(grados))
+    return pwm.set_pwm(servo, 0, servo_min+offset(grados))
 
 def moveBackward(servo,grados):
 	return pwm.set_pwm(servo, 0, servo_max-offset(grados))
+
+def moveForwardGrips(servo,grados):
+	return pwm.set_pwm(servo, 0, servo_min_grip+offsetgrip(grados))
 
 ## GRIP CORE SERVO FUNCTIONS
 def openLeftGrip():
     global leftgripclosed
     if leftgripclosed:
-        for i in range(35):
-            moveForward(leftgripservo,i)
-            time.sleep(0.03)
+        for i in range(30):
+            moveForwardGrips(leftgripservo,i)
+            time.sleep(0.02)
         leftgripclosed = False
+    else:
+        moveForwardGrips(leftgripservo,30)    
  
 def closeLeftGrip():
     global leftgripclosed
     if not leftgripclosed:
-        for i in range(35):
-            moveForward(leftgripservo,35-i)
-            time.sleep(0.03)
-        leftgripclosed = True    
+        for i in range(30):
+            moveForwardGrips(leftgripservo,30-i)
+            time.sleep(0.02)
+        leftgripclosed = True
+    else:
+        moveForwardGrips(leftgripservo,0)
 
 def openRightGrip():
     global rightgripclosed
     if rightgripclosed:    
-        for i in range(35):
-            moveForward(rightgripservo,i)
-            time.sleep(0.03)
-        rightgripclosed = False    
+        for i in range(30):
+            moveForwardGrips(rightgripservo,i)
+            time.sleep(0.02)
+        rightgripclosed = False
+    else:
+        moveForwardGrips(rightgripservo,30)
+    
         
 def closeRightGrip():
     global rightgripclosed
     if not rightgripclosed:    
-        for i in range(35):
-            moveForward(rightgripservo,35-i)
-            time.sleep(0.03)
+        for i in range(30):
+            moveForwardGrips(rightgripservo,30-i)
+            time.sleep(0.02)
         rightgripclosed = True
+    else:
+        moveForwardGrips(rightgripservo,0)
+        
+def turnWrist(servo):
+    moveForward(servo,180)
+    
+
+def turnPrimaWrist(servo):
+    moveForward(servo,0)
+                
+def centerWrist(servo):
+    moveForward(servo,90)
+    
+
+def centerLeftWrist():
+    global leftwristcenter
+    if not leftwristcenter:    
+        for i in range(90):
+            moveForward(leftwristservo,i)
+            time.sleep(0.03)
+        leftwristcenter = True
+    else:
+        moveForward(leftwristservo,0)   
         
 ##  RUBIK ROBOT MOVEMENT FUNCTIONS    
 def openGrips():
-    moveForward(leftwristservo,0)
-    moveForward(rightwristservo,0)
+    moveForward(leftwristservo,90)
+    moveForward(rightwristservo,90)
     openLeftGrip()
     openRightGrip()
     
@@ -106,17 +147,39 @@ def closeGrips():
     closeRightGrip()
     
 def rotateCubeToRight():
-    moveForward(rightgripservo,0)
+    closeRightGrip()
     openLeftGrip()
+    time.sleep(0.5)
     moveForward(rightwristservo,90)
+    time.sleep(0.5)
     closeLeftGrip()
+    time.sleep(1)
     openRightGrip()
+    time.sleep(1)
+    moveForward(rightwristservo,0)
+    time.sleep(0.5)
+    closeRightGrip()
+
+def D_movement():
+    closeRightGrip()
+    moveForward(rightwristservo,90)
+    time.sleep(0.5)
+    openRightGrip()
+    time.sleep(1)
+    moveForward(rightwristservo,0)
+    closeRightGrip()
+
+def Dprima_movement():
+    closeRightGrip()
+    moveBackward(rightwristservo,90)
+    time.sleep(0.5)
+    openRightGrip()
+    time.sleep(1)
     moveForward(rightwristservo,0)
     closeRightGrip()
     
 def start():
     print("Starting cube detection")
-    #openGrips()
     closeGrips()
 
 def stop():
@@ -153,16 +216,48 @@ while True:
     startValue= GPIO.input(startButton)
     drawText("hola", draw, image)
     if (startValue== 0):
+        #rotateCubeToRight()
+        #D_movement()
+        #moveForward(rightwristservo,0)
+        pwm.set_pwm(rightwristservo, 0, servo_min)
+        time.sleep(5)
         stop()
         drawText("adios", draw, image)
         GPIO.cleanup(startButton)
         exit()
-    else: 
-        start()
+    else:
+        openRightGrip()
+        time.sleep(2)
+        closeRightGrip()
+        turnWrist(rightwristservo)
+        time.sleep(2)
+        centerWrist(rightwristservo)
+        time.sleep(2)
+        turnPrimaWrist(rightwristservo)
+        time.sleep(2)
+        centerWrist(rightwristservo)
+        time.sleep(2)
+        openRightGrip()
+        centerWrist(leftwristservo)
+        openLeftGrip()
+        time.sleep(2)
+        closeLeftGrip()
+        turnWrist(leftwristservo)
+        time.sleep(2)
+        centerWrist(leftwristservo)
+        time.sleep(2)
+        turnPrimaWrist(leftwristservo)
+        time.sleep(2)
+        centerWrist(leftwristservo)
+        time.sleep(2)
+       
+      
+
+    
+
     
  
 GPIO.cleanup(startButton)
- 
 openGrips()
 closeGrips()
 rotateCubeToRight()
