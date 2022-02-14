@@ -114,7 +114,6 @@ def closeRightGrip():
         
 def turnWrist(servo):
     moveForward(servo,180)
-    
 
 def turnPrimaWrist(servo):
     moveForward(servo,0)
@@ -135,14 +134,14 @@ def centerLeftWrist():
         
 ##  RUBIK ROBOT MOVEMENT FUNCTIONS    
 def openGrips():
-    moveForward(leftwristservo,90)
-    moveForward(rightwristservo,90)
+    centerWrist(leftwristservo)
+    centerWrist(rightwristservo)
     openLeftGrip()
     openRightGrip()
     
 def closeGrips():
-    moveForward(leftwristservo,0)
-    moveForward(rightwristservo,0)
+    centerWrist(leftwristservo)
+    centerWrist(rightwristservo)
     closeLeftGrip()
     closeRightGrip()
     
@@ -150,33 +149,51 @@ def rotateCubeToRight():
     closeRightGrip()
     openLeftGrip()
     time.sleep(0.5)
-    moveForward(rightwristservo,90)
+    turnWrist(rightwristservo)
     time.sleep(0.5)
     closeLeftGrip()
     time.sleep(1)
     openRightGrip()
     time.sleep(1)
-    moveForward(rightwristservo,0)
+    centerWrist(rightwristservo)
     time.sleep(0.5)
     closeRightGrip()
 
 def D_movement():
     closeRightGrip()
-    moveForward(rightwristservo,90)
+    turnWrist(rightwristservo)
     time.sleep(0.5)
     openRightGrip()
     time.sleep(1)
-    moveForward(rightwristservo,0)
+    centerWrist(rightwristservo)
     closeRightGrip()
 
 def Dprima_movement():
     closeRightGrip()
-    moveBackward(rightwristservo,90)
+    turnPrimaWrist(rightwristservo)
     time.sleep(0.5)
     openRightGrip()
     time.sleep(1)
-    moveForward(rightwristservo,0)
+    centerWrist(rightwristservo)
     closeRightGrip()
+    
+def B_movement():
+    closeLeftGrip()
+    turnWrist(leftwristservo)
+    time.sleep(0.5)
+    openLeftGrip()
+    time.sleep(1)
+    centerWrist(leftwristservo)
+    closeLeftGrip()
+
+def Bprima_movement():
+    closeLeftGrip()
+    turnPrimaWrist(leftwristservo)
+    time.sleep(0.5)
+    openLeftGrip()
+    time.sleep(1)
+    centerWrist(leftwristservo)
+    closeLeftGrip()    
     
 def start():
     print("Starting cube detection")
@@ -185,6 +202,33 @@ def start():
 def stop():
     print("Stop cube detection")
     openGrips()
+    
+def test():
+    openRightGrip()
+    time.sleep(2)
+    closeRightGrip()
+    turnWrist(rightwristservo)
+    time.sleep(2)
+    centerWrist(rightwristservo)
+    time.sleep(2)
+    turnPrimaWrist(rightwristservo)
+    time.sleep(2)
+    centerWrist(rightwristservo)
+    time.sleep(2)
+    openRightGrip()
+    centerWrist(leftwristservo)
+    openLeftGrip()
+    time.sleep(2)
+    closeLeftGrip()
+    turnWrist(leftwristservo)
+    time.sleep(2)
+    centerWrist(leftwristservo)
+    time.sleep(2)
+    turnPrimaWrist(leftwristservo)
+    time.sleep(2)
+    centerWrist(leftwristservo)
+    time.sleep(2)
+       
     
 def drawInit():
     width=disp .width
@@ -226,31 +270,10 @@ while True:
         GPIO.cleanup(startButton)
         exit()
     else:
-        openRightGrip()
-        time.sleep(2)
-        closeRightGrip()
-        turnWrist(rightwristservo)
-        time.sleep(2)
-        centerWrist(rightwristservo)
-        time.sleep(2)
-        turnPrimaWrist(rightwristservo)
-        time.sleep(2)
-        centerWrist(rightwristservo)
-        time.sleep(2)
-        openRightGrip()
-        centerWrist(leftwristservo)
-        openLeftGrip()
-        time.sleep(2)
-        closeLeftGrip()
-        turnWrist(leftwristservo)
-        time.sleep(2)
-        centerWrist(leftwristservo)
-        time.sleep(2)
-        turnPrimaWrist(leftwristservo)
-        time.sleep(2)
-        centerWrist(leftwristservo)
-        time.sleep(2)
-       
+        Bprima_movement()
+        time.sleep(1)
+        openGrips()
+        time.sleep(10)
       
 
     
