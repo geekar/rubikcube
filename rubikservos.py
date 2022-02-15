@@ -158,6 +158,50 @@ def rotateCubeToRight():
     centerWrist(rightwristservo)
     time.sleep(0.5)
     closeRightGrip()
+    
+    
+def rotateCubeToLeft():
+    closeRightGrip()
+    openLeftGrip()
+    time.sleep(0.5)
+    turnPrimaWrist(rightwristservo)
+    time.sleep(0.5)
+    closeLeftGrip()
+    time.sleep(1)
+    openRightGrip()
+    time.sleep(1)
+    centerWrist(rightwristservo)
+    time.sleep(0.5)
+    closeRightGrip()
+
+def rotateCubeUpToRight():
+    closeLeftGrip()
+    openRightGrip()
+    time.sleep(0.5)
+    turnPrimaWrist(leftwristservo)
+    time.sleep(0.5)
+    closeRightGrip()
+    time.sleep(1)
+    openLeftGrip()
+    time.sleep(1)
+    centerWrist(leftwristservo)
+    time.sleep(0.5)
+    closeLeftGrip()
+    
+
+def rotateCubeUpToLeft():
+    closeLeftGrip()
+    openRightGrip()
+    time.sleep(0.5)
+    turnWrist(leftwristservo)
+    time.sleep(0.5)
+    closeRightGrip()
+    time.sleep(1)
+    openLeftGrip()
+    time.sleep(1)
+    centerWrist(leftwristservo)
+    time.sleep(0.5)
+    closeLeftGrip()    
 
 def D_movement():
     closeRightGrip()
@@ -193,7 +237,73 @@ def Bprima_movement():
     openLeftGrip()
     time.sleep(1)
     centerWrist(leftwristservo)
-    closeLeftGrip()    
+    closeLeftGrip()
+    
+def L_movement():
+    rotateCubeUpToLeft()
+    time.sleep(1)
+    D_movement()
+    time.sleep(1)
+    rotateCubeUpToRight()
+
+def Lprima_movement():
+    rotateCubeUpToLeft()
+    time.sleep(1)
+    Dprima_movement()
+    time.sleep(1)
+    rotateCubeUpToRight()
+    
+def R_movement():
+    rotateCubeUpToRight()
+    time.sleep(1)
+    D_movement()
+    time.sleep(1)
+    rotateCubeUpToLeft()
+
+def Rprima_movement():
+    rotateCubeUpToRight()
+    time.sleep(1)
+    Dprima_movement()
+    time.sleep(1)
+    rotateCubeUpToLeft()
+    
+    
+def U_movement():
+    rotateCubeUpToRight()
+    rotateCubeUpToRight()
+    time.sleep(1)
+    D_movement()
+    time.sleep(1)
+    rotateCubeUpToLeft()
+    rotateCubeUpToLeft()
+    
+    
+def Uprima_movement():
+    rotateCubeUpToRight()
+    rotateCubeUpToRight()
+    time.sleep(1)
+    Dprima_movement()
+    time.sleep(1)
+    rotateCubeUpToLeft()
+    rotateCubeUpToLeft()
+    
+def F_movement():
+    rotateCubeToRight()
+    rotateCubeToRight()
+    time.sleep(1)
+    B_movement()
+    time.sleep(1)
+    rotateCubeUpToLeft()
+    rotateCubeUpToLeft()
+
+def Fprima_movement():
+    rotateCubeToRight()
+    rotateCubeToRight()
+    time.sleep(1)
+    Bprima_movement()
+    time.sleep(1)
+    rotateCubeUpToLeft()
+    rotateCubeUpToLeft()  
     
 def start():
     print("Starting cube detection")
@@ -228,7 +338,13 @@ def test():
     time.sleep(2)
     centerWrist(leftwristservo)
     time.sleep(2)
-       
+    
+def test2():
+    time.sleep(2)
+    R_movement()
+    time.sleep(1)
+    openGrips()
+    time.sleep(10)
     
 def drawInit():
     width=disp .width
@@ -270,10 +386,11 @@ while True:
         GPIO.cleanup(startButton)
         exit()
     else:
-        Bprima_movement()
-        time.sleep(1)
-        openGrips()
-        time.sleep(10)
+        test2()
+#         Bprima_movement()
+#         time.sleep(1)
+#         openGrips()
+#         time.sleep(10)
       
 
     
