@@ -221,6 +221,10 @@ def Dprima_movement():
     centerWrist(rightwristservo)
     closeRightGrip()
     
+def Ddouble_movement():
+    D_movement()
+    D_movement()
+    
 def B_movement():
     closeLeftGrip()
     turnWrist(leftwristservo)
@@ -238,6 +242,10 @@ def Bprima_movement():
     time.sleep(1)
     centerWrist(leftwristservo)
     closeLeftGrip()
+
+def Bdouble_movement():
+    B_movement()
+    B_movement()
     
 def L_movement():
     rotateCubeUpToLeft()
@@ -250,6 +258,14 @@ def Lprima_movement():
     rotateCubeUpToLeft()
     time.sleep(1)
     Dprima_movement()
+    time.sleep(1)
+    rotateCubeUpToRight()
+    
+def Ldouble_movement():
+    rotateCubeUpToLeft()
+    time.sleep(1)
+    D_movement()
+    D_movement()
     time.sleep(1)
     rotateCubeUpToRight()
     
@@ -266,7 +282,14 @@ def Rprima_movement():
     Dprima_movement()
     time.sleep(1)
     rotateCubeUpToLeft()
-    
+
+def Rdouble_movement():
+    rotateCubeUpToRight()
+    time.sleep(1)
+    D_movement()
+    D_movement()
+    time.sleep(1)
+    rotateCubeUpToLeft()  
     
 def U_movement():
     rotateCubeUpToRight()
@@ -277,7 +300,6 @@ def U_movement():
     rotateCubeUpToLeft()
     rotateCubeUpToLeft()
     
-    
 def Uprima_movement():
     rotateCubeUpToRight()
     rotateCubeUpToRight()
@@ -286,6 +308,16 @@ def Uprima_movement():
     time.sleep(1)
     rotateCubeUpToLeft()
     rotateCubeUpToLeft()
+    
+def Udouble_movement():
+    rotateCubeUpToRight()
+    rotateCubeUpToRight()
+    time.sleep(1)
+    D_movement()
+    D_movement()
+    time.sleep(1)
+    rotateCubeUpToLeft()
+    rotateCubeUpToLeft()    
     
 def F_movement():
     rotateCubeToRight()
@@ -303,7 +335,17 @@ def Fprima_movement():
     Bprima_movement()
     time.sleep(1)
     rotateCubeUpToLeft()
-    rotateCubeUpToLeft()  
+    rotateCubeUpToLeft()
+    
+def Fdouble_movement():
+    rotateCubeToRight()
+    rotateCubeToRight()
+    time.sleep(1)
+    B_movement()
+    B_movement()
+    time.sleep(1)
+    rotateCubeUpToLeft()
+    rotateCubeUpToLeft()    
     
 def start():
     print("Starting cube detection")
