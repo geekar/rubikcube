@@ -8,6 +8,7 @@ import Adafruit_SSD1306
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
+from rubik_solver import utils
 
 # Initialise the PCA9685 using desired address and/or bus:
 pwm = Adafruit_PCA9685.PCA9685(address = 0x40, busnum = 1)
@@ -411,8 +412,45 @@ def drawText(str, draw, image):
     disp.image(image)
     disp.display()
     time.sleep(.1)
- 
+    
+def movement(letter):
+    switcher = {
+       "L": L_movement(),
+       "L'": Lprima_movement(),
+       "L2": Ldouble_movement(),
+       "R": R_movement(),
+       "R'": Rprima_movement(),
+       "R2": Rdouble_movement(),
+       "U": U_movement(),
+       "U'": Uprima_movement(),
+       "U2": Udouble_movement(),
+       "D": D_movement(),
+       "D'": Dprima_movement(),
+       "D2": Ddouble_movement(),
+       "F": F_movement(),
+       "F'": Fprima_movement(),
+       "F2": Fdouble_movement(),
+       "B": B_movement(),
+       "B'": Bprima_movement(),
+       "B2": Bdouble_movement(),       
+    }
+    return switcher.get(letter, "Invalid Operation! Please try again.")
+
+def solve(solution):
+    for letter in solution:
+        movement(letter)
+
+
+
+
 draw, image = drawInit()
+cube = 'oyyoyyoyygggggggggwoowoowoobbbbbbbbbrryrryrryrwwrwwrww'
+solution = utils.solve(cube, 'Kociemba')
+print(solution)
+movement(solution)
+
+exit()
+
 openGrips()
 while True:
     startValue= GPIO.input(startButton)
