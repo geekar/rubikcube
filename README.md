@@ -23,3 +23,7 @@ Raspberry Pi 4 GPIO Pinout and GPIO
 
    * https://www.etechnophiles.com/raspberry-pi-4-gpio-pinout-specifications-and-schematic/
    * https://raspberrypihq.com/use-a-push-button-with-raspberry-pi-gpio/
+
+Rubik Solver Kociemba Algorithm library
+
+   * https://pypi.org/project/rubik-solver/
