@@ -13,6 +13,7 @@ from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 from rubik_solver import utils
+import rubikfacedetection
 
 # Initialise the PCA9685 using desired address and/or bus:
 pwm = Adafruit_PCA9685.PCA9685(address = 0x40, busnum = 1)
@@ -449,6 +450,41 @@ def movement(letter):
 def solve(solution):
     for letter in solution:
         movement(letter)
+        
+def formatFacesToStr(faces):
+    strCube = ""
+    for face in faces:
+        strCube = strCube + buildStringFace(face)
+    return strCube    
+        
+def captureRubikFaces():
+#     strCube = ""
+#     face = captureRubikFace()
+#     strCube = strCube + buildStringFace(face)
+    faces = numpy.empty(6, dtype=object)
+    ##First face
+    face[0] = captureRubikFace()
+    ##Second face
+    rotateCubeToRight()
+    face[1] = captureRubikFace()
+    ##Third face
+    rotateCubeToRight()
+    face[2] = captureRubikFace()
+    ##Fourth face
+    rotateCubeToRight()
+    face[3] = captureRubikFace()
+    ##Fifth face
+    rotateCubeUpToFront()
+    face[4] = captureRubikFace()
+    ##Sixth face
+    rotateCubeToRight()
+    rotateCubeToRight()
+    face[5] = captureRubikFace()
+    rotateCubeUpToFront()
+    rotateCubeToRight()
+    cube = formatFacesToStr(faces)
+    return cube
+
 
 
 
