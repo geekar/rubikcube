@@ -4,7 +4,7 @@
 """
 @author: alber
 """
-
+import numpy as np
 import Adafruit_PCA9685
 import time
 import RPi.GPIO as GPIO
@@ -14,6 +14,7 @@ from PIL import ImageDraw
 from PIL import ImageFont
 from rubik_solver import utils
 import rubikfacedetection
+from rubikfacedetection import *
 
 # Initialise the PCA9685 using desired address and/or bus:
 pwm = Adafruit_PCA9685.PCA9685(address = 0x40, busnum = 1)
@@ -53,6 +54,7 @@ leftwristservo = 0
 rightwristservo = 1
 leftgripservo = 2
 rightgripservo = 3
+
 
 
 # Configure min and max servo pulse lengths
@@ -461,7 +463,7 @@ def captureRubikFaces():
 #     strCube = ""
 #     face = captureRubikFace()
 #     strCube = strCube + buildStringFace(face)
-    faces = numpy.empty(6, dtype=object)
+    faces = np.empty(6, dtype=object)
     ##First face
     face[0] = captureRubikFace()
     ##Second face
@@ -493,7 +495,11 @@ draw, image = drawInit()
 cube = 'oyyoyyoyygggggggggwoowoowoobbbbbbbbbrryrryrryrwwrwwrww'
 solution = utils.solve(cube, 'Kociemba')
 print(solution)
-movement(solution)
+#movement(solution)
+faces = np.empty(1, dtype=object)
+faces[0] = captureRubikFace()
+print(buildStringFace(faces[0]))
+drawText(buildStringFace(faces[0]), draw, image)
 
 exit()
 

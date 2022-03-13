@@ -19,6 +19,22 @@ colors = {
     'w': ([0, 0, 190], [255, 255, 255])        #White
     }
 
+def detectColor(h,s,v):
+    for color, (lower, upper) in colors.items():
+        lower = np.array(lower, dtype=np.uint8)
+        upper = np.array(upper, dtype=np.uint8)
+        if (lower[0] <= h and upper[0] >= h) and (lower[1] <= s and upper[1] >= s) and (lower[2] <= v and upper[2] >= v):
+            if (len(color)==2):
+                color = color[:1]
+            return color
+    return 'w'
+
+def getColorName(img,x,y):
+    h,s,v=img[y,x]
+    color = detectColor(h,s,v)
+   # print("h={}, s={}, v={}, color={} ".format(h,s,v,color))
+    return color
+
 def ashFrame(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     return gray
@@ -28,7 +44,9 @@ def blurredFrame(img):
     return blurred
 
 def cannyFrame(img):
-    threshold1 = 23
+    #threshold1 = 23
+    #threshold2 = 20
+    threshold1 = 30
     threshold2 = 20
     canny = cv2.Canny(img, threshold1, threshold2)
     return canny
@@ -67,7 +85,7 @@ def findPieces(cx,cy,perimeter,frame):
                 face.append(piece)
     return face
 
-def findsCandidateEdges(img):
+def findsCandidateEdges(img,frameHSV):
     contours,hierarchy  = cv2.findContours(img.copy(), cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
     index = 0
     pieces = []
@@ -113,13 +131,15 @@ def findsCandidateEdges(img):
     return pieces
 
 def detectFacefromImage(img):
-    cleanImage(img)
-    detected = false
-    while (not detected):
-        face = findsCandidateEdges(img)
-        if (len(face)==9):
-            detected = true
-    return face
+    imgClean = cleanImage(img)
+    detected = False
+    cv2.imshow("image", imgClean)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    face = findsCandidateEdges(imgClean,img)
+    if (len(face)==9):
+        detected = True
+    return face,detected
 
 def buildStringFace(pieces):
     str = ''
@@ -140,15 +160,25 @@ def drawDetectedFace(img, face):
         cv2.putText(img,color,(x,y),cv2.FONT_HERSHEY_SIMPLEX,1,(50,50,255),2)
     return img
 
+
 cap = cv2.VideoCapture(0)
 cap.set(3, 640)
 cap.set(4, 480)
+
+def closeCamera():
+    cap.release()
+    cv2.destroyAllWindows()
 
 def captureRubikFace():
     ret,frame = cap.read()
     face = []
     if (ret == True):
         frameHSV = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
-        face = detectFacefromImage(frameHSV)
+        face, detected = detectFacefromImage(frameHSV)
+        while (not detected):
+            ret,frame = cap.read()
+            face = []
+            frameHSV = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+            face, detected = detectFacefromImage(frameHSV)
     return face    
 
