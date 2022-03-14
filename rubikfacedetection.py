@@ -116,7 +116,7 @@ def findMinimumPiece(pieces):
              valorMinPiece = valorPiece
         pos = pos+1
     return minimumPiece,position         
-         
+          
 
 def sortPieces(pieces):
     orderedPieces = []
