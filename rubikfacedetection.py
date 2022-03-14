@@ -35,13 +35,6 @@ def getColorName(img,x,y):
    # print("h={}, s={}, v={}, color={} ".format(h,s,v,color))
     return color
 
-def ashFrame(img):
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    return gray
-    
-def blurredFrame(img):
-    blurred = cv2.GaussianBlur(img, (3, 3), 1)
-    return blurred
 
 def vickNeshFrame(img):
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -53,6 +46,14 @@ def vickNeshFrame(img):
     gray = cv2.adaptiveThreshold(gray,40,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY_INV,5,0)
     return gray
 
+def ashFrame(img):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    return gray
+    
+def blurredFrame(img):
+    blurred = cv2.blur(img, (3, 3), 2)
+    return blurred
+
 def cannyFrame(img):
 #    threshold1 = 20
 #    threshold2 = 30
@@ -60,16 +61,18 @@ def cannyFrame(img):
 #    threshold2 = 25
     threshold1 = cv2.getTrackbarPos("Threshold1", "Parameters")
     threshold2 = cv2.getTrackbarPos("Threshold2", "Parameters")
-    canny = cv2.Canny(img, threshold1, threshold2)
+    canny = cv2.Canny(img, threshold1, threshold2,3)
     return canny
 
 def erodeFrame(img):
-    kernel = np.ones((3,3), np.uint8)
+    #kernel = np.ones((3,3), np.uint8)
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(9,9))
     dilated = cv2.erode(img, kernel, iterations=2)
     return dilated
 
 def lineexpandFrame(img):
-    kernel = np.ones((3,3), np.uint8)
+    #kernel = np.ones((3,3), np.uint8)
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(9,9))
     dilated = cv2.dilate(img, kernel, iterations=2)
     return dilated
 
@@ -79,7 +82,7 @@ def cleanImage(img):
     canny = cannyFrame(blurred)
     dilated = lineexpandFrame(canny)
     eroded = erodeFrame(dilated)
-    return dilated
+    return eroded
 
 def findPieces(cx,cy,perimeter,frame):
     longBigSquare = perimeter/4
@@ -97,8 +100,39 @@ def findPieces(cx,cy,perimeter,frame):
                 face.append(piece)
     return face
 
+def findMinimumPiece(pieces):
+    minimumPiece = (5000,5000,3,(255,0,0))
+    (xmin, ymin, radiusmin,  colormin ) = minimumPiece
+    pos = 0
+    position = pos
+    valorMinPiece = 500000
+    for piece in pieces:
+        (x, y, radius, color ) = piece
+        valorPiece = y*10
+        valorPiece = x + valorPiece
+        if (valorPiece < valorMinPiece):
+             minimumPiece = piece
+             position = pos
+             valorMinPiece = valorPiece
+        pos = pos+1
+    return minimumPiece,position         
+         
+
+def sortPieces(pieces):
+    orderedPieces = []
+    while (len(orderedPieces)!=9):
+        minimumPiece,position = findMinimumPiece(pieces)
+        print("--")
+        print(minimumPiece)
+        orderedPieces.append(minimumPiece)
+        del pieces[position]       
+    return orderedPieces
+                
+
+
+
 def findsCandidateEdges(img,frameHSV):
-    contours,hierarchy  = cv2.findContours(img.copy(), cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    contours,hierarchy  = cv2.findContours(img.copy(), cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
 #     contours,hierarchy  = cv2.findContours(img.copy(), cv2.RETR_CCOMP,cv2.CHAIN_APPROX_NONE)
     index = 0
     pieces = []
@@ -109,6 +143,8 @@ def findsCandidateEdges(img,frameHSV):
     areaMin=10000
 #     areaMax=1200000
     areaMax = cv2.getTrackbarPos("AreaMax", "Parameters")
+    
+    i = 0
 
     print("******************")
     # Step 1/4: filter all contours to only those thcaptureRubikFace()at are square-ish shapes.
@@ -118,14 +154,15 @@ def findsCandidateEdges(img,frameHSV):
             print("area=")
             print(area)
             peri = cv2.arcLength(contour, True)
-            approx = cv2.approxPolyDP(contour, 0.1 * peri, True)
+            approx = cv2.approxPolyDP(contour, 0.15 * peri, True)
             corners = len(approx)
             print("corners=")
             print(corners)
             x,y,w,h = cv2.boundingRect(approx)
-            if corners==4:                   
-                aspect_ratio = float(w)/h 
-                if aspect_ratio > 0.8 and aspect_ratio < 1.2:  
+            if corners==4:
+                i=i+1
+                aspect_ratio = float(w)/h
+                if aspect_ratio > 0.79 and aspect_ratio < 1.21:  
                     # compute the center of the contour
                     M = cv2.moments(contour)
                 
@@ -138,28 +175,37 @@ def findsCandidateEdges(img,frameHSV):
                    # if areaMin < area < areaMax and cX is not None:
                     color =  getColorName(frameHSV,cX,cY)
                     square = (x,y,w,h, color)
-                    if (area  >  maxAreaFound):
-                        maxAreaFound = area
-                        pieces =  findPieces(cX,cY,peri,frameHSV)          
+                    piece = (cX, cY, w, color)               
+                    pieces.append(piece)
+#                     if (area  >  maxAreaFound):
+#                         maxAreaFound = area
+#                         pieces =  findPieces(cX,cY,peri,frameHSV)          
                    # if w >= 30 and w <= 60 and area / (w * h) > 0.4:
                     if area / (w * h) > 0.4:
                         final_contours.append(square)
+                        cv2.rectangle(frameHSV,(x,y),(x+w,y+h),(255,0,0),1)      
     print("Num final contours=")    
     print(len(final_contours))
     print("Max Area=")
     print(maxAreaFound)
-    if (len(final_contours) < 9) or (maxAreaFound <  areaMin): 
-        return []
-    print("More than 8 squares detected and big Sqare Detected!")
+#     if (len(final_contours) < 9) or (maxAreaFound <  areaMin):
+    if (len(final_contours) < 9):
+        return [],frameHSV
+    print("More than 8 squares detected and big Square Detected!")
+    print(pieces)
+    print("****")
+    pieces = sortPieces(pieces)
+    print(pieces)
     
-    return pieces
+    return pieces,frameHSV
 
 def detectFacefromImage(img):
     imgClean = cleanImage(img)
     detected = False
     cv2.imshow("image", imgClean)
     cv2.waitKey(0)
-    face = findsCandidateEdges(imgClean,img)
+    face,img = findsCandidateEdges(imgClean,img)
+    cv2.imshow("imageDetect", img)
     if (len(face)==9):
         detected = True
     return face,detected
@@ -192,9 +238,9 @@ cap.set(3, 640)
 cap.set(4, 480)
 cv2.namedWindow("Parameters")
 cv2.resizeWindow("Parameters",640,240)
-cv2.createTrackbar("Threshold1","Parameters",14,255,empty)
-cv2.createTrackbar("Threshold2","Parameters",37,255,empty)
-cv2.createTrackbar("AreaMax","Parameters",15000,120000,empty)
+cv2.createTrackbar("Threshold1","Parameters",60,255,empty)
+cv2.createTrackbar("Threshold2","Parameters",23,255,empty)
+cv2.createTrackbar("AreaMax","Parameters",1000000,1200000,empty)
 
 def closeCamera():
     cap.release()
@@ -208,6 +254,7 @@ def captureRubikFace():
         face, detected = detectFacefromImage(frame)
         while (not detected):
             ret,frame = cap.read()
+            frame = frame[0:400,0:480]
             face = []
             frameHSV = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
             face, detected = detectFacefromImage(frameHSV)
