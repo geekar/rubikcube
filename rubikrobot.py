@@ -496,31 +496,31 @@ cube = 'oyyoyyoyygggggggggwoowoowoobbbbbbbbbrryrryrryrwwrwwrww'
 solution = utils.solve(cube, 'Kociemba')
 print(solution)
 #movement(solution)
-faces = np.empty(1, dtype=object)
-faces[0] = captureRubikFace()
-print(buildStringFace(faces[0]))
-drawText(buildStringFace(faces[0]), draw, image)
 
-exit()
 
-openGrips()
+#exit()
+
+#openGrips()
 while True:
     startValue= GPIO.input(startButton)
     drawText("hola", draw, image)
     if (startValue== 0):
+        drawText("adios", draw, image)
         #rotateCubeToRight()
         #D_movement()
         #moveForward(rightwristservo,0)
-        pwm.set_pwm(rightwristservo, 0, servo_min)
-        time.sleep(5)
-        stop()
-        drawText("adios", draw, image)
+        #pwm.set_pwm(rightwristservo, 0, servo_min)
+        #time.sleep(5)
+        #stop()
         GPIO.cleanup(startButton)
+        faces = np.empty(1, dtype=object)
+        faces[0] = captureRubikFace()
+        drawText(buildStringFace(faces[0]), draw, image)
         exit()
     else:
-        test2()
+#        test2()
 #         Bprima_movement()
-#         time.sleep(1)
+        time.sleep(0.5)
 #         openGrips()
 #         time.sleep(10)
       

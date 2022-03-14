@@ -213,8 +213,8 @@ cap.set(4, 480)
 
 cv2.namedWindow("Parameters")
 cv2.resizeWindow("Parameters",640,240)
-cv2.createTrackbar("Threshold1","Parameters",0,255,empty)
-cv2.createTrackbar("Threshold2","Parameters",115,255,empty)
+cv2.createTrackbar("Threshold1","Parameters",15,255,empty)
+cv2.createTrackbar("Threshold2","Parameters",25,255,empty)
 cv2.createTrackbar("Area","Parameters",15000,80000,empty)
 
 
