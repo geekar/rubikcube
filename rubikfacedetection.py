@@ -3,6 +3,9 @@
 """
 import cv2
 import numpy as np
+import math
+import matplotlib.pyplot as plt
+from operator import itemgetter
 
 colors = {
     'b': ([79, 55, 56], [171, 255, 255]),    # Blue
@@ -10,14 +13,24 @@ colors = {
     'g2': ([6, 80, 100], [7, 255, 102]),    # Green
     'g3': ([125,7, 105], [127, 8, 109]),    # Green
     'g4': ([81,14, 55], [170, 32, 65]),    # Green
-    'y': ([17, 25, 114], [39, 255, 255]),   # Yellow
-    'o1': ([2, 80, 125], [16, 255, 255]),     # Orange
-    'o2': ([0, 80, 125], [16, 190, 255]),     # Orange
-    'r1': ([0, 90, 20], [2, 255, 255]),     # Red
-    'r2': ([1, 161, 20], [1, 255, 255]),     # Red
-    'r3': ([172, 100, 20], [180, 255, 255]),     # Red  
-    'w': ([0, 0, 190], [255, 255, 255])        #White
+    'y': ([17, 50, 114], [39, 255, 255]),   # Yellow
+    'o1': ([0, 80, 50], [16, 255, 255]),     # Orange
+    'o2': ([90, 90, 50], [100, 255, 255]),     # Orange
+    'r1': ([1, 150, 20], [2, 255, 195]),     # Red
+    'r2': ([1, 161, 20], [1, 255, 195]),     # Red
+    'r3': ([170, 110, 110], [180, 255, 200]),     # Red  
+    'w': ([0, 0, 125], [255, 50, 255])        #White
     }
+
+color_names = ['b','g','y','o','r','w']
+
+DS_SQUARE_SIDE_RATIO = 1.5
+DS_MORPH_KERNEL_SIZE = 5
+DS_MORPH_ITERATIONS = 2
+DS_MIN_SQUARE_LENGTH_RATIO = 0.08
+DS_MIN_AREA_RATIO = 0.68
+DS_MIN_SQUARE_SIZE = 0.10 #times the width of image
+DS_MAX_SQUARE_SIZE = 0.3
 
 def detectColor(h,s,v):
     for color, (lower, upper) in colors.items():
@@ -31,20 +44,198 @@ def detectColor(h,s,v):
 
 def getColorName(img,x,y):
     h,s,v=img[y,x]
-    color = detectColor(h,s,v)
-   # print("h={}, s={}, v={}, color={} ".format(h,s,v,color))
+    color = detectColor(h,s,v) 
+    print("h={}, s={}, v={}, color={} ".format(h,s,v,color))
     return color
 
 
-def vickNeshFrame(img):
-    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(5,5))
-    gray = cv2.morphologyEx(gray, cv2.MORPH_OPEN, kernel)
-    gray = cv2.morphologyEx(gray, cv2.MORPH_CLOSE, kernel)
+def mshow(im, titles = None):
+    if str(type(im)) != str(type([])):
+        plt.imshow(im)
+        plt.show()
+    else:
+        m = int(pow(len(im), 0.5))
+        n = int(math.ceil(len(im)/float(m)))
+        for i in range(len(im)):
+            plt.subplot(m, n, i+1)
+            plt.imshow(im[i])
+            if titles:
+                plt.title(titles[i])
+        plt.show()
+        
 
-    gray = cv2.adaptiveThreshold(gray,40,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY_INV,5,0)
-    return gray
+def index_to_cube(pts):
+    print("pts=")
+    print(pts)
+    print(len(pts))
+    
+
+    if len(pts) != 9:
+        return None
+    
+    pts = [list(pts[i])+[i] for i in range(len(pts))]
+    pts.sort(key=itemgetter(1))
+    mat = [[pts[3*i+j] for j in range(3)] for i in range(3)]
+    print("mat=")
+    print(mat)
+    
+    for i in range(3):
+        mat[i].sort(key=itemgetter(0))
+
+    for i in range(3):
+        for j in range(3):
+            mat[i][j] = mat[i][j][2]
+
+    return mat
+
+def get_black_mask(img, smoothed=False, isBGR=False):
+    DEBUG_SHOW_MASK = False
+    
+    if isBGR:
+        im = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
+  
+#     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+#   
+#     ret, thresh = cv2.threshold(gray, 15, 255, cv2.THRESH_BINARY_INV)
+#     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+#     
+#     black_image = np.zeros(shape=[512, 512, 3], dtype=np.uint8)
+#     
+#     mask = cv2.drawContours(black_image, contours, -1,(0,0,255),3)
+
+    
+     #tuple([0, 0, 0]), tuple([255, 10, 255])
+    
+    mask = cv2.inRange(img, tuple([0, 0, 0]), tuple([120, 255, 120]))
+    
+    if smoothed:
+        kernel = np.ones(tuple([DS_MORPH_KERNEL_SIZE]*2))
+        mask = cv2.erode(mask, kernel, iterations=1)
+        mask = cv2.dilate(mask, kernel, iterations=1) 
+
+    if DEBUG_SHOW_MASK:
+        mshow([mask], ['black mask in function'])
+
+    return mask
+
+def get_color_mask(im, color_name, smoothed=True, isBGR=False):
+    DEBUG_SHOW_MASK = False
+
+    if isBGR:
+        im = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
+    
+    
+    print(color_name)
+ 
+    
+    if color_name == "g":
+        mask = cv2.inRange(im, tuple(colors["g1"][0]), tuple(colors["g1"][1]))|cv2.inRange(im, tuple(colors["g2"][0]), tuple(colors["g2"][1]))|cv2.inRange(im, tuple(colors["g3"][0]), tuple(colors["g3"][1]))| cv2.inRange(im, tuple(colors["g4"][0]), tuple(colors["g4"][1]))
+    elif color_name == "r":
+        mask = cv2.inRange(im, tuple(colors["r1"][0]), tuple(colors["r1"][1]))|cv2.inRange(im, tuple(colors["r2"][0]), tuple(colors["r2"][1]))|cv2.inRange(im, tuple(colors["r3"][0]), tuple(colors["r3"][1]))
+    elif color_name == "o":
+        mask = cv2.inRange(im, tuple(colors["o1"][0]), tuple(colors["o1"][1]))|cv2.inRange(im, tuple(colors["o2"][0]), tuple(colors["o2"][1]))
+    else:
+        color = colors[color_name]
+        mask = cv2.inRange(im, tuple(color[0]), tuple(color[1]))
+        
+    if smoothed:
+        kernel = np.ones(tuple([DS_MORPH_KERNEL_SIZE]*2))
+        mask = cv2.erode(mask, kernel, iterations=1)
+        mask = cv2.dilate(mask, kernel, iterations=1) 
+
+    if DEBUG_SHOW_MASK:
+        mshow([mask], [color_name + ' mask in function'])
+
+    return mask
+
+#accepts BGR image
+def detect_square(im, color_name, maskBorders, isBGR=True):
+
+    DEBUG_SHOW_MASK = True
+    DEBUG_SHOW_INSIDE_FUNC = True
+
+    def remove_bad_contours(conts):
+        new_conts = []
+        
+        for cont in conts:
+            bound_rect = cv2.minAreaRect(cont)
+            length, breadth = float(bound_rect[1][0]), float(bound_rect[1][1])
+            try:
+##                print length/breadth, cv2.contourArea(cont)/(length*breadth)
+                if max((length/breadth, breadth/length)) > DS_SQUARE_SIDE_RATIO:
+                    continue
+                if cv2.contourArea(cont)/(length*breadth) < DS_MIN_AREA_RATIO:
+                    continue
+                if not DS_MAX_SQUARE_SIZE*im.shape[0] > max((length, breadth)) > DS_MIN_SQUARE_SIZE*im.shape[0]:
+                    continue
+##                print length/breadth, cv2.contourArea(cont)/(length*breadth)
+                new_conts.append(cont)
+            except ZeroDivisionError:
+                continue
+
+        return new_conts
+
+    if isBGR:
+        im = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
+    global debug_mask
+
+    mask = get_color_mask(im, color_name,True)
+    
+    #mask = get_black_mask(im, True)
+    
+    
+    maskBorders = cv2.bitwise_not(maskBorders)
+
+    mask = cv2.bitwise_and(mask, mask, mask=maskBorders)
+    
+
+    debug_mask=[np.array(mask)]
+
+    if DEBUG_SHOW_MASK:
+        mshow(debug_mask, ['COLOUR ' + color_name]*len(debug_mask))
+    
+    conts,hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    
+    conts = remove_bad_contours(conts)
+
+    if DEBUG_SHOW_INSIDE_FUNC:
+        im2 = np.array(im)
+        for cont in conts:
+            cv2.circle(im2, tuple(np.array(cv2.minAreaRect(cont)[0],dtype=int)),
+                       int(pow(cv2.contourArea(cont)/3.14159, 0.5)), (0,255,255),thickness=2)
+        mshow(cv2.cvtColor(im2, cv2.COLOR_HSV2RGB))
+
+    return [cv2.minAreaRect(cont) for cont in conts]
+
+#accepts BGR
+def get_cube_state(im, imborders):
+
+    colors_detected = []
+    cube_state = [[None]*3 for _ in range(3)]
+    
+    for color_name in color_names:
+        rects = detect_square(im, color_name, imborders )
+        for rect in rects:
+            colors_detected.append((color_name, rect))
+        
+    #from pprint import pprint
+    print(colors_detected)
+
+    index_mat = index_to_cube([prop[1][0] for prop in colors_detected])
+    
+    print(index_mat)
+
+    
+    if index_mat != None:
+        for i in range(3):
+            for j in range(3):
+                cube_state[i][j] = colors_detected[index_mat[i][j]][0]
+
+        return cube_state
+    else:
+        return None
 
 def ashFrame(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -183,7 +374,13 @@ def findsCandidateEdges(img,frameHSV):
                    # if w >= 30 and w <= 60 and area / (w * h) > 0.4:
                     if area / (w * h) > 0.4:
                         final_contours.append(square)
-                        cv2.rectangle(frameHSV,(x,y),(x+w,y+h),(255,0,0),1)      
+                        h,s,v=frameHSV[cY,cX]
+                        cl = (int(h),int(s),int(v))                                               
+                        cv2.rectangle(frameHSV,(x,y),(x+w,y+h),cl,1)
+                        
+                        #str = "h={}, s={}, v={}, color={} ".format(h,s,v,color)
+                        #cv2.putText(frameHSV,str,(cX,cY),cv2.FONT_HERSHEY_SIMPLEX,1,cl,2)
+                        
     print("Num final contours=")    
     print(len(final_contours))
     print("Max Area=")
@@ -199,13 +396,14 @@ def findsCandidateEdges(img,frameHSV):
     
     return pieces,frameHSV
 
-def detectFacefromImage(img):
-    imgClean = cleanImage(img)
+def detectFacefromImage(imgBGR):
+    imgClean = cleanImage(imgBGR)
     detected = False
     cv2.imshow("image", imgClean)
-    cv2.waitKey(0)
-    face,img = findsCandidateEdges(imgClean,img)
-    cv2.imshow("imageDetect", img)
+    cv2.waitKey(0)    
+    face,img = findsCandidateEdges(imgClean,imgBGR)
+    face = get_cube_state(imgBGR,imgClean)
+    cv2.imshow("imageDetect", imgBGR)
     if (len(face)==9):
         detected = True
     return face,detected
@@ -224,9 +422,14 @@ def buildStringFace(pieces):
     return str
     
 def drawDetectedFace(img, face):
+    print("face")
     for piece in face:
         (x, y, radius,   color) = piece
-        cv2.putText(img,color,(x,y),cv2.FONT_HERSHEY_SIMPLEX,1,(50,50,255),2)
+        h,s,v=img[y,x]
+        str = "h={}, s={}, v={}, color={} ".format(h,s,v,color)
+#         cv2.putText(img,color,(x,y),cv2.FONT_HERSHEY_SIMPLEX,1,(50,50,255),2)
+        cv2.putText(img,str,(x,y),cv2.FONT_HERSHEY_SIMPLEX,1,(50,50,255),1)
+         
     return img
 
 
@@ -238,8 +441,8 @@ cap.set(3, 640)
 cap.set(4, 480)
 cv2.namedWindow("Parameters")
 cv2.resizeWindow("Parameters",640,240)
-cv2.createTrackbar("Threshold1","Parameters",60,255,empty)
-cv2.createTrackbar("Threshold2","Parameters",23,255,empty)
+cv2.createTrackbar("Threshold1","Parameters",30,255,empty)
+cv2.createTrackbar("Threshold2","Parameters",10,255,empty)
 cv2.createTrackbar("AreaMax","Parameters",1000000,1200000,empty)
 
 def closeCamera():
@@ -249,15 +452,13 @@ def closeCamera():
 def captureRubikFace():
     ret,frame = cap.read()
     face = []
+    detected = False
     if (ret == True):
-        frameHSV = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
-        face, detected = detectFacefromImage(frame)
         while (not detected):
             ret,frame = cap.read()
             frame = frame[0:400,0:480]
             face = []
-            frameHSV = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
-            face, detected = detectFacefromImage(frameHSV)
+            face, detected = detectFacefromImage(frame.copy())
         imgResult = drawDetectedFace(frame,face)    
         cv2.imshow("result", imgResult)
         cv2.waitKey(0)
