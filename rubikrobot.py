@@ -503,9 +503,9 @@ print(solution)
 #openGrips()
 while True:
     startValue= GPIO.input(startButton)
-    drawText("hola", draw, image)
+    drawText("begin", draw, image)
     if (startValue== 0):
-        drawText("adios", draw, image)
+        drawText("Start detecting cube", draw, image)
         #rotateCubeToRight()
         #D_movement()
         #moveForward(rightwristservo,0)

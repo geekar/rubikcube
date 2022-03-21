@@ -18,7 +18,7 @@ colors = {
     'o2': ([90, 90, 50], [100, 255, 255]),     # Orange
     'r1': ([1, 150, 20], [2, 255, 195]),     # Red
     'r2': ([1, 161, 20], [1, 255, 195]),     # Red
-    'r3': ([170, 110, 110], [180, 255, 200]),     # Red  
+    'r3': ([150, 110, 110], [180, 255, 200]),     # Red  
     'w': ([0, 0, 125], [255, 50, 255])        #White
     }
 
@@ -29,7 +29,7 @@ DS_MORPH_KERNEL_SIZE = 5
 DS_MORPH_ITERATIONS = 2
 DS_MIN_SQUARE_LENGTH_RATIO = 0.08
 DS_MIN_AREA_RATIO = 0.68
-DS_MIN_SQUARE_SIZE = 0.10 #times the width of image
+DS_MIN_SQUARE_SIZE = 0.2 #times the width of image
 DS_MAX_SQUARE_SIZE = 0.3
 
 def detectColor(h,s,v):
@@ -186,7 +186,6 @@ def detect_square(im, color_name, maskBorders, isBGR=True):
     
     
     maskBorders = cv2.bitwise_not(maskBorders)
-
     mask = cv2.bitwise_and(mask, mask, mask=maskBorders)
     
 
@@ -225,7 +224,6 @@ def get_cube_state(im, imborders):
 
     index_mat = index_to_cube([prop[1][0] for prop in colors_detected])
     
-    print(index_mat)
 
     
     if index_mat != None:
@@ -233,7 +231,7 @@ def get_cube_state(im, imborders):
             for j in range(3):
                 cube_state[i][j] = colors_detected[index_mat[i][j]][0]
 
-        return cube_state
+        return cube_state,len(colors_detected)
     else:
         return None
 
@@ -264,7 +262,7 @@ def erodeFrame(img):
 def lineexpandFrame(img):
     #kernel = np.ones((3,3), np.uint8)
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(9,9))
-    dilated = cv2.dilate(img, kernel, iterations=2)
+    dilated = cv2.dilate(img, kernel, iterations=3)
     return dilated
 
 def cleanImage(img):
@@ -375,8 +373,8 @@ def findsCandidateEdges(img,frameHSV):
                     if area / (w * h) > 0.4:
                         final_contours.append(square)
                         h,s,v=frameHSV[cY,cX]
-                        cl = (int(h),int(s),int(v))                                               
-                        cv2.rectangle(frameHSV,(x,y),(x+w,y+h),cl,1)
+                        #cl = (int(h),int(s),int(v))                                               
+                        #cv2.rectangle(frameHSV,(x,y),(x+w,y+h),cl,1)
                         
                         #str = "h={}, s={}, v={}, color={} ".format(h,s,v,color)
                         #cv2.putText(frameHSV,str,(cX,cY),cv2.FONT_HERSHEY_SIMPLEX,1,cl,2)
@@ -400,15 +398,19 @@ def detectFacefromImage(imgBGR):
     imgClean = cleanImage(imgBGR)
     detected = False
     cv2.imshow("image", imgClean)
-    cv2.waitKey(0)    
+    nfaces = 0
+#     cv2.waitKey(0)    
     face,img = findsCandidateEdges(imgClean,imgBGR)
-    face = get_cube_state(imgBGR,imgClean)
+    face,nfaces = get_cube_state(imgBGR,imgClean)
     cv2.imshow("imageDetect", imgBGR)
-    if (len(face)==9):
+    cv2.waitKey(0)
+    print("nfaces=")
+    print(nfaces)
+    if (nfaces==9):
         detected = True
     return face,detected
 
-def buildStringFace(pieces):
+def buildStringFaceOld(pieces):
     str = ''
     if (len(pieces) != 9):
         str = "Error face not well build!"
@@ -419,6 +421,16 @@ def buildStringFace(pieces):
             colors.append(color)
         template = ("{}{}{}{}{}{}{}{}{}")
         str=  template.format(*colors).strip()
+    return str
+
+def buildStringFace(face):
+    str = ''
+    colors = []
+    for i in range(3):
+        for j in range(3):            
+            colors.append(face[i][j]) 
+    template = ("{}{}{}{}{}{}{}{}{}")
+    str=  template.format(*colors).strip()
     return str
     
 def drawDetectedFace(img, face):
@@ -441,8 +453,8 @@ cap.set(3, 640)
 cap.set(4, 480)
 cv2.namedWindow("Parameters")
 cv2.resizeWindow("Parameters",640,240)
-cv2.createTrackbar("Threshold1","Parameters",30,255,empty)
-cv2.createTrackbar("Threshold2","Parameters",10,255,empty)
+cv2.createTrackbar("Threshold1","Parameters",5,255,empty)
+cv2.createTrackbar("Threshold2","Parameters",20,255,empty)
 cv2.createTrackbar("AreaMax","Parameters",1000000,1200000,empty)
 
 def closeCamera():
@@ -459,8 +471,9 @@ def captureRubikFace():
             frame = frame[0:400,0:480]
             face = []
             face, detected = detectFacefromImage(frame.copy())
-        imgResult = drawDetectedFace(frame,face)    
-        cv2.imshow("result", imgResult)
-        cv2.waitKey(0)
+            
+        #imgResult = drawDetectedFace(frame,face)    
+        #cv2.imshow("result", imgResult)
+        #cv2.waitKey(0)
     return face    
 
