@@ -34,8 +34,8 @@ disp.begin()
 disp.clear()
 disp.display()
 
-leftgripclosed = False
-rightgripclosed = False
+leftgripclosed = True
+rightgripclosed = True
 leftwristturned = False
 leftwristcenter = False
 
@@ -363,6 +363,8 @@ def Fdouble_movement():
     
 def start():
     print("Starting cube detection")
+#     openGrips()
+#     time.sleep(2)
     closeGrips()
 
 def stop():
@@ -370,30 +372,30 @@ def stop():
     openGrips()
     
 def test():
-    openRightGrip()
-    time.sleep(2)
-    closeRightGrip()
-    turnWrist(rightwristservo)
-    time.sleep(2)
-    centerWrist(rightwristservo)
-    time.sleep(2)
-    turnPrimaWrist(rightwristservo)
-    time.sleep(2)
-    centerWrist(rightwristservo)
-    time.sleep(2)
-    openRightGrip()
-    centerWrist(leftwristservo)
+#     openRightGrip()
+#     time.sleep(5)
+#     closeRightGrip()
+#     turnWrist(rightwristservo)
+#     time.sleep(2)
+#     centerWrist(rightwristservo)
+#     time.sleep(2)
+#     turnPrimaWrist(rightwristservo)
+#     time.sleep(2)
+#     centerWrist(rightwristservo)
+#     time.sleep(2)
+#     openRightGrip()
+#     centerWrist(leftwristservo)
     openLeftGrip()
-    time.sleep(2)
+    time.sleep(5)
     closeLeftGrip()
-    turnWrist(leftwristservo)
-    time.sleep(2)
-    centerWrist(leftwristservo)
-    time.sleep(2)
-    turnPrimaWrist(leftwristservo)
-    time.sleep(2)
-    centerWrist(leftwristservo)
-    time.sleep(2)
+#     turnWrist(leftwristservo)
+#     time.sleep(2)
+#     centerWrist(leftwristservo)
+#     time.sleep(2)
+#     turnPrimaWrist(leftwristservo)
+#     time.sleep(2)
+#     centerWrist(leftwristservo)
+#     time.sleep(2)
     
 def test2():
     time.sleep(2)
@@ -505,6 +507,7 @@ while True:
     startValue= GPIO.input(startButton)
     drawText("begin", draw, image)
     if (startValue== 0):
+        start()
         drawText("Start detecting cube", draw, image)
         #rotateCubeToRight()
         #D_movement()

@@ -7,18 +7,22 @@ import math
 import matplotlib.pyplot as plt
 from operator import itemgetter
 
+from PIL import Image, ImageFilter
+
 colors = {
-    'b': ([79, 55, 56], [171, 255, 255]),    # Blue
+    'b': ([79, 55, 56], [150, 255, 255]),    # Blue
     'g1': ([40, 80,94], [78, 255, 255]),    # Green
     'g2': ([6, 80, 100], [7, 255, 102]),    # Green
     'g3': ([125,7, 105], [127, 8, 109]),    # Green
     'g4': ([81,14, 55], [170, 32, 65]),    # Green
-    'y': ([17, 50, 114], [39, 255, 255]),   # Yellow
-    'o1': ([0, 80, 50], [16, 255, 255]),     # Orange
-    'o2': ([90, 90, 50], [100, 255, 255]),     # Orange
-    'r1': ([1, 150, 20], [2, 255, 195]),     # Red
-    'r2': ([1, 161, 20], [1, 255, 195]),     # Red
-    'r3': ([150, 110, 110], [180, 255, 200]),     # Red  
+    'y': ([11, 50, 114], [39, 255, 255]),   # Yellow
+    #'o1': ([0, 60, 20], [16, 180, 255]),     # Orange
+    'o1': ([173, 100, 50], [180, 255, 255]),     # Orange
+    'o2': ([173, 100, 50], [180, 255, 255]),     # Orange
+    'r1': ([0, 150, 20], [10, 255, 255]),     # Red
+    'r2': ([159, 150, 20], [172, 255, 255]),     # Red
+    'r3': ([159, 150, 20], [172, 255, 255]),    # Red
+   # 'r3': ([160, 150, 100], [180, 255, 255]),     # Red  
     'w': ([0, 0, 125], [255, 50, 255])        #White
     }
 
@@ -202,6 +206,9 @@ def detect_square(im, color_name, maskBorders, isBGR=True):
     if DEBUG_SHOW_INSIDE_FUNC:
         im2 = np.array(im)
         for cont in conts:
+            pos = tuple(np.array(cv2.minAreaRect(cont)[0],dtype=int))
+            print(pos)
+            getColorName(im2,pos[0],pos[1])
             cv2.circle(im2, tuple(np.array(cv2.minAreaRect(cont)[0],dtype=int)),
                        int(pow(cv2.contourArea(cont)/3.14159, 0.5)), (0,255,255),thickness=2)
         mshow(cv2.cvtColor(im2, cv2.COLOR_HSV2RGB))
@@ -234,6 +241,68 @@ def get_cube_state(im, imborders):
         return cube_state,len(colors_detected)
     else:
         return None
+    
+def detectEdges(img):
+    #define the vertical filter
+    vertical_filter = [[-1,-2,-1], [0,0,0], [1,2,1]]
+
+    #define the horizontal filter
+    horizontal_filter = [[-1,0,1], [-2,0,2], [-1,0,1]]
+
+
+    #get the dimensions of the image
+    n,m,d = img.shape
+
+    #initialize the edges image
+    edges_img = img.copy()
+
+    #loop over all pixels in the image
+    for row in range(3, n-2):
+        for col in range(3, m-2):
+            
+            #create little local 3x3 box
+            local_pixels = img[row-1:row+2, col-1:col+2, 0]
+            
+            #apply the vertical filter
+            vertical_transformed_pixels = vertical_filter*local_pixels
+            #remap the vertical score
+            vertical_score = vertical_transformed_pixels.sum()/4
+            
+            #apply the horizontal filter
+            horizontal_transformed_pixels = horizontal_filter*local_pixels
+            #remap the horizontal score
+            horizontal_score = horizontal_transformed_pixels.sum()/4
+            
+            #combine the horizontal and vertical scores into a total edge score
+            edge_score = (vertical_score**2 + horizontal_score**2)**.5
+            
+            #insert this edge score into the edges image
+            edges_img[row, col] = [edge_score]*3
+
+    #remap the values in the 0-1 range in case they went out of bounds
+    edges_img = edges_img/edges_img.max()
+    return edges_img
+
+def whiteBalanceImage(img):
+    b,g,r = cv2.split(img)
+    r_avg = cv2.mean(r)[0]
+    g_avg = cv2.mean(g)[0]
+    b_avg = cv2.mean(b)[0]
+    
+    # Find the gain of each channel
+    k = (r_avg + g_avg + b_avg) / 3
+    kr = k / r_avg
+    kg = k / g_avg
+    kb = k / b_avg
+
+    r = cv2.addWeighted(src1=r, alpha=kr, src2=0, beta=0, gamma=0)
+    g = cv2.addWeighted(src1=g, alpha=kg, src2=0, beta=0, gamma=0)
+    b = cv2.addWeighted(src1=b, alpha=kb, src2=0, beta=0, gamma=0)
+
+    balance_img = cv2.merge([b, g, r])
+    #balance_img = cv2.cvtColor(balance_img, cv2.COLOR_BGR2RGB)
+    return balance_img
+
 
 def ashFrame(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -251,27 +320,40 @@ def cannyFrame(img):
     threshold1 = cv2.getTrackbarPos("Threshold1", "Parameters")
     threshold2 = cv2.getTrackbarPos("Threshold2", "Parameters")
     canny = cv2.Canny(img, threshold1, threshold2,3)
+    #image = img.filter(ImageFilter.FIND_EDGES)
     return canny
 
-def erodeFrame(img):
+def crossFrame(img):
+    cross = erodeFrame(img, cv2.MORPH_CROSS)
+    cross = lineexpandFrame(cross, cv2.MORPH_CROS)
+    return cross
+
+def linesFrame(img):    
+    lines = lineexpandFrame(img, cv2.MORPH_RECT)
+#     lines = erodeFrame(lines, cv2.MORPH_RECT)
+    return lines
+    
+def erodeFrame(img, kernel):
     #kernel = np.ones((3,3), np.uint8)
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(9,9))
-    dilated = cv2.erode(img, kernel, iterations=2)
+    kernel = cv2.getStructuringElement(kernel,(4,4))
+    dilated = cv2.erode(img, kernel, iterations=3)
     return dilated
 
-def lineexpandFrame(img):
+def lineexpandFrame(img, kernel):
     #kernel = np.ones((3,3), np.uint8)
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(9,9))
+    kernel = cv2.getStructuringElement(kernel,(3,3))
     dilated = cv2.dilate(img, kernel, iterations=3)
     return dilated
 
 def cleanImage(img):
+    #gray = ashFrame(img)
+    #gray = detectEdges(img)
     gray = ashFrame(img)
-    blurred = blurredFrame(gray)
-    canny = cannyFrame(blurred)
-    dilated = lineexpandFrame(canny)
-    eroded = erodeFrame(dilated)
-    return eroded
+    canny = blurredFrame(gray)
+    canny = cannyFrame(canny)    
+#     canny = crossFrame(canny)
+    canny = linesFrame(canny)
+    return canny
 
 def findPieces(cx,cy,perimeter,frame):
     longBigSquare = perimeter/4
@@ -402,7 +484,8 @@ def detectFacefromImage(imgBGR):
 #     cv2.waitKey(0)    
     face,img = findsCandidateEdges(imgClean,imgBGR)
     face,nfaces = get_cube_state(imgBGR,imgClean)
-    cv2.imshow("imageDetect", imgBGR)
+    #cv2.imshow("imageDetect", imgBGR)
+    cv2.imshow("imageColor", img)
     cv2.waitKey(0)
     print("nfaces=")
     print(nfaces)
@@ -453,8 +536,8 @@ cap.set(3, 640)
 cap.set(4, 480)
 cv2.namedWindow("Parameters")
 cv2.resizeWindow("Parameters",640,240)
-cv2.createTrackbar("Threshold1","Parameters",5,255,empty)
-cv2.createTrackbar("Threshold2","Parameters",20,255,empty)
+cv2.createTrackbar("Threshold1","Parameters",16,255,empty)
+cv2.createTrackbar("Threshold2","Parameters",10,255,empty)
 cv2.createTrackbar("AreaMax","Parameters",1000000,1200000,empty)
 
 def closeCamera():
@@ -468,7 +551,8 @@ def captureRubikFace():
     if (ret == True):
         while (not detected):
             ret,frame = cap.read()
-            frame = frame[0:400,0:480]
+            frame = whiteBalanceImage(frame)
+            #frame = frame[0:400,0:480]
             face = []
             face, detected = detectFacefromImage(frame.copy())
             
