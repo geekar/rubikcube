@@ -52,11 +52,25 @@ def getColorName(img,x,y):
     print("h={}, s={}, v={}, color={} ".format(h,s,v,color))
     return color
 
-
+def colorNombreLargo(color_name):
+    switcher = {
+    'r': "ROJO",
+    'b': "AZUL",
+    'g': "VERDE",
+    'y': "AMARILLO",
+    'o': "NARANJA",
+    'w': "BLANCO"
+    }
+    return switcher.get(color_name)
 
 def mshow(im, titles = None):
     if str(type(im)) != str(type([])):
         plt.imshow(im)
+        if titles:
+            plt.title(
+            label=titles,
+            fontsize=30,
+            color="black")
         plt.show()
     else:
         m = int(pow(len(im), 0.5))
@@ -153,6 +167,18 @@ def get_color_mask(im, color_name, smoothed=True, isBGR=False):
 
     return mask
 
+def colorNombreLargo(color_name):
+    switcher = {
+    'r': "ROJO",
+    'b': "AZUL",
+    'g': "VERDE",
+    'y': "AMARILLO",
+    'o': "NARANJA",
+    'w': "BLANCO"
+    }
+    return switcher.get(color_name)
+
+
 #accepts BGR image
 def detect_square(im, color_name, maskBorders, isBGR=True):
 
@@ -196,7 +222,7 @@ def detect_square(im, color_name, maskBorders, isBGR=True):
     debug_mask=[np.array(mask)]
 
     if DEBUG_SHOW_MASK:
-        mshow(debug_mask, ['COLOUR ' + color_name]*len(debug_mask))
+        mshow(debug_mask, ['COLOR ' + colorNombreLargo(color_name)]*len(debug_mask))
     
     conts,hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -207,11 +233,15 @@ def detect_square(im, color_name, maskBorders, isBGR=True):
         im2 = np.array(im)
         for cont in conts:
             pos = tuple(np.array(cv2.minAreaRect(cont)[0],dtype=int))
-            print(pos)
+            #print(pos)
             getColorName(im2,pos[0],pos[1])
             cv2.circle(im2, tuple(np.array(cv2.minAreaRect(cont)[0],dtype=int)),
-                       int(pow(cv2.contourArea(cont)/3.14159, 0.5)), (0,255,255),thickness=2)
-        mshow(cv2.cvtColor(im2, cv2.COLOR_HSV2RGB))
+                       int(pow(cv2.contourArea(cont)/3.14159, 0.5)), (255,255,255),thickness=2)
+        #mshow(cv2.cvtColor(im2, cv2.COLOR_HSV2RGB))
+        mshow(cv2.cvtColor(im2, cv2.COLOR_HSV2RGB), 'COLOR ' + colorNombreLargo(color_name))
+        
+       
+       
 
     return [cv2.minAreaRect(cont) for cont in conts]
 
