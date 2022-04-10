@@ -20,10 +20,12 @@ from rubikfacedetection import *
 pwm = Adafruit_PCA9685.PCA9685(address = 0x40, busnum = 1)
 # Initialise the GPIO to use push buttons
 GPIO.setmode(GPIO.BOARD)
-# jetson nano startButton=15
 
 startButton=16
+selectButton=18
+
 GPIO.setup(startButton, GPIO.IN)
+GPIO.setup(selectButton, GPIO.IN)
 
 #Initialize display 128x64
 RST= None
@@ -34,8 +36,8 @@ disp.begin()
 disp.clear()
 disp.display()
 
-leftgripclosed = True
-rightgripclosed = True
+leftgripclosed = False
+rightgripclosed = False
 leftwristturned = False
 leftwristcenter = False
 
@@ -503,22 +505,38 @@ print(solution)
 #exit()
 
 #openGrips()
+status = 0
+drawText("menu>\n->Close grips", draw, image)
 while True:
     startValue= GPIO.input(startButton)
-    drawText("begin", draw, image)
-    if (startValue== 0):
-        start()
-        drawText("Start detecting cube", draw, image)
-        #rotateCubeToRight()
-        #D_movement()
-        #moveForward(rightwristservo,0)
-        #pwm.set_pwm(rightwristservo, 0, servo_min)
-        #time.sleep(5)
-        #stop()
-        GPIO.cleanup(startButton)
+    selectValue= GPIO.input(selectButton)
+    if (selectValue== 0):
+        status = (status+1)% 3
+        if (status == 0):
+            drawText("menu>\n->Close grips", draw, image)
+        elif (status == 1):
+            drawText("menu>\n->Detect cube", draw, image)
+        elif (status == 2):
+            drawText("menu>\n->Open grips", draw, image)         
+    if ((startValue==0) and (status==0)):
+        drawText("Closing grips...", draw, image)
+        closeGrips()
+        time.sleep(1)
+        drawText("menu>\n->Close grips", draw, image)
+    elif ((startValue==0) and (status==1)):
+        drawText("Detecting Cube...", draw, image)
         faces = np.empty(1, dtype=object)
         faces[0] = captureRubikFace()
         drawText(buildStringFace(faces[0]), draw, image)
+        time.sleep(5)
+        drawText("menu>\n->Detect cube", draw, image)
+    elif ((startValue==0) and (status==2)):
+        drawText("Opening grips...", draw, image)
+        openGrips()
+        time.sleep(1)
+        drawText("Exit...", draw, image)
+        GPIO.cleanup(startButton)
+        GPIO.cleanup(selectButton)
         exit()
     else:
 #        test2()
