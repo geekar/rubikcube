@@ -407,7 +407,7 @@ def test2():
     time.sleep(10)
     
 def drawInit():
-    width=disp .width
+    width=disp.width
     height=disp.height
     image=Image.new('1', (width, height))
     draw=ImageDraw.Draw(image)
@@ -418,7 +418,7 @@ def drawInit():
     return draw,  image
 
 def drawText(str, draw, image):
-    width=disp .width
+    width=disp.width
     height=disp.height
     padding=-2
     top=padding
@@ -511,14 +511,19 @@ while True:
     startValue= GPIO.input(startButton)
     selectValue= GPIO.input(selectButton)
     if (selectValue== 0):
+        print("Boton up")
         status = (status+1)% 3
         if (status == 0):
+            print("menu>\n->Close grips")
             drawText("menu>\n->Close grips", draw, image)
         elif (status == 1):
+            print("menu>\n->Detect cube")
             drawText("menu>\n->Detect cube", draw, image)
         elif (status == 2):
+            print("menu>\n->Open grips")
             drawText("menu>\n->Open grips", draw, image)         
     if ((startValue==0) and (status==0)):
+        print("Closing grips...")
         drawText("Closing grips...", draw, image)
         closeGrips()
         time.sleep(1)
@@ -527,6 +532,7 @@ while True:
         drawText("Detecting Cube...", draw, image)
         faces = np.empty(1, dtype=object)
         faces[0] = captureRubikFace()
+        print(buildStringFace(faces[0]))
         drawText(buildStringFace(faces[0]), draw, image)
         time.sleep(5)
         drawText("menu>\n->Detect cube", draw, image)

@@ -15,13 +15,14 @@ colors = {
     'g2': ([6, 80, 100], [7, 255, 102]),    # Green
     'g3': ([125,7, 105], [127, 8, 109]),    # Green
     'g4': ([81,14, 55], [170, 32, 65]),    # Green
-    'y': ([11, 50, 114], [39, 255, 255]),   # Yellow
-    #'o1': ([0, 60, 20], [16, 180, 255]),     # Orange
-    'o1': ([173, 100, 50], [180, 255, 255]),     # Orange
-    'o2': ([173, 100, 50], [180, 255, 255]),     # Orange
-    'r1': ([0, 150, 20], [10, 255, 255]),     # Red
-    'r2': ([159, 150, 20], [172, 255, 255]),     # Red
-    'r3': ([159, 150, 20], [172, 255, 255]),    # Red
+    'y': ([22, 35, 114], [39, 255, 255]),   # Yellow
+    'o1': ([1, 20, 114], [22, 255, 255]),     # Orange
+    'o2': ([170, 50, 210], [190, 255, 255]),     # Orange
+    'o3': ([170, 50, 210], [190, 255, 255]),     # Orange
+    'r1': ([0, 70, 20], [10, 250, 200]),     # Red
+    'r2': ([159, 70, 80], [210, 255, 209]),     # Red
+    'r3': ([159, 70, 80], [210, 255, 209]),    # Red
+    
    # 'r3': ([160, 150, 100], [180, 255, 255]),     # Red  
     'w': ([0, 0, 125], [255, 50, 255])        #White
     }
@@ -107,35 +108,7 @@ def index_to_cube(pts):
 
     return mat
 
-def get_black_mask(img, smoothed=False, isBGR=False):
-    DEBUG_SHOW_MASK = False
-    
-    if isBGR:
-        im = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
-  
-#     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-#   
-#     ret, thresh = cv2.threshold(gray, 15, 255, cv2.THRESH_BINARY_INV)
-#     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-#     
-#     black_image = np.zeros(shape=[512, 512, 3], dtype=np.uint8)
-#     
-#     mask = cv2.drawContours(black_image, contours, -1,(0,0,255),3)
 
-    
-     #tuple([0, 0, 0]), tuple([255, 10, 255])
-    
-    mask = cv2.inRange(img, tuple([0, 0, 0]), tuple([120, 255, 120]))
-    
-    if smoothed:
-        kernel = np.ones(tuple([DS_MORPH_KERNEL_SIZE]*2))
-        mask = cv2.erode(mask, kernel, iterations=1)
-        mask = cv2.dilate(mask, kernel, iterations=1) 
-
-    if DEBUG_SHOW_MASK:
-        mshow([mask], ['black mask in function'])
-
-    return mask
 
 def get_color_mask(im, color_name, smoothed=True, isBGR=False):
     DEBUG_SHOW_MASK = False
@@ -180,8 +153,8 @@ def colorNombreLargo(color_name):
 
 
 #accepts BGR image
-def detect_square(im, color_name, maskBorders, isBGR=True):
-
+def detect_square(img, color_name, maskBorders, isBGR=True):
+    im = img.copy()
     DEBUG_SHOW_MASK = True
     DEBUG_SHOW_INSIDE_FUNC = True
 
@@ -207,8 +180,9 @@ def detect_square(im, color_name, maskBorders, isBGR=True):
         return new_conts
 
     if isBGR:
+        print("Transformando BGR to HSV")
         im = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
-    global debug_mask
+    #global debug_mask
 
     mask = get_color_mask(im, color_name,True)
     
@@ -379,11 +353,11 @@ def cleanImage(img):
     #gray = ashFrame(img)
     #gray = detectEdges(img)
     gray = ashFrame(img)
-    canny = blurredFrame(gray)
-    canny = cannyFrame(canny)    
+    blurred = blurredFrame(gray)
+    canny = cannyFrame(blurred)    
 #     canny = crossFrame(canny)
-    canny = linesFrame(canny)
-    return canny
+    erode = linesFrame(canny)
+    return erode
 
 def findPieces(cx,cy,perimeter,frame):
     longBigSquare = perimeter/4
@@ -511,16 +485,17 @@ def detectFacefromImage(imgBGR):
     detected = False
     cv2.imshow("image", imgClean)
     nfaces = 0
-#     cv2.waitKey(0)    
-    face,img = findsCandidateEdges(imgClean,imgBGR)
+    cv2.waitKey(0)    
+#    face,img = findsCandidateEdges(imgClean,imgBGR)
     face,nfaces = get_cube_state(imgBGR,imgClean)
-    #cv2.imshow("imageDetect", imgBGR)
-    cv2.imshow("imageColor", img)
+    cv2.imshow("imageDetect", imgBGR)
+#     cv2.imshow("imageColor", img)
     cv2.waitKey(0)
     print("nfaces=")
     print(nfaces)
     if (nfaces==9):
         detected = True
+        cv2.destroyAllWindows()
     return face,detected
 
 def buildStringFaceOld(pieces):
@@ -561,27 +536,31 @@ def drawDetectedFace(img, face):
 def empty(a):
     pass
 
-cap = cv2.VideoCapture(0)
-cap.set(3, 640)
-cap.set(4, 480)
-cv2.namedWindow("Parameters")
-cv2.resizeWindow("Parameters",640,240)
-cv2.createTrackbar("Threshold1","Parameters",16,255,empty)
-cv2.createTrackbar("Threshold2","Parameters",10,255,empty)
-cv2.createTrackbar("AreaMax","Parameters",1000000,1200000,empty)
+# cap = cv2.VideoCapture(0)
+# cap.set(3, 640)
+# cap.set(4, 480)
+
 
 def closeCamera():
     cap.release()
     cv2.destroyAllWindows()
 
 def captureRubikFace():
+    cap = cv2.VideoCapture(0)
+    cap.set(3, 640)
+    cap.set(4, 480)
+    cv2.namedWindow("Parameters")
+    cv2.resizeWindow("Parameters",640,240)
+    cv2.createTrackbar("Threshold1","Parameters",16,255,empty)
+    cv2.createTrackbar("Threshold2","Parameters",10,255,empty)
+    cv2.createTrackbar("AreaMax","Parameters",1000000,1200000,empty)
     ret,frame = cap.read()
     face = []
     detected = False
     if (ret == True):
         while (not detected):
-            ret,frame = cap.read()
-            frame = whiteBalanceImage(frame)
+            #ret,frame = cap.read()
+            #frame = whiteBalanceImage(frame)
             #frame = frame[0:400,0:480]
             face = []
             face, detected = detectFacefromImage(frame.copy())
