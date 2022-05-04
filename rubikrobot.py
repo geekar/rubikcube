@@ -535,7 +535,7 @@ while True:
         print(buildStringFace(faces[0]))
         drawText(buildStringFace(faces[0]), draw, image)
         time.sleep(5)
-        drawText("menu>\n->Detect cube", draw, image)
+        #drawText("menu>\n->Detect cube", draw, image)
     elif ((startValue==0) and (status==2)):
         drawText("Opening grips...", draw, image)
         openGrips()
