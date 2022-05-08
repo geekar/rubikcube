@@ -84,18 +84,18 @@ def moveForwardGrips(servo,grados):
 def openLeftGrip():
     global leftgripclosed
     if leftgripclosed:
-        for i in range(30):
+        for i in range(40):
             moveForwardGrips(leftgripservo,i)
-            time.sleep(0.02)
+            time.sleep(0.01)
         leftgripclosed = False
     else:
-        moveForwardGrips(leftgripservo,30)    
+        moveForwardGrips(leftgripservo,40)    
  
 def closeLeftGrip():
     global leftgripclosed
     if not leftgripclosed:
-        for i in range(30):
-            moveForwardGrips(leftgripservo,30-i)
+        for i in range(40):
+            moveForwardGrips(leftgripservo,40-i)
             time.sleep(0.02)
         leftgripclosed = True
     else:
@@ -104,19 +104,19 @@ def closeLeftGrip():
 def openRightGrip():
     global rightgripclosed
     if rightgripclosed:    
-        for i in range(30):
+        for i in range(40):
             moveForwardGrips(rightgripservo,i)
-            time.sleep(0.02)
+            time.sleep(0.01)
         rightgripclosed = False
     else:
-        moveForwardGrips(rightgripservo,30)
+        moveForwardGrips(rightgripservo,40)
     
         
 def closeRightGrip():
     global rightgripclosed
     if not rightgripclosed:    
-        for i in range(30):
-            moveForwardGrips(rightgripservo,30-i)
+        for i in range(39):
+            moveForwardGrips(rightgripservo,39-i)
             time.sleep(0.02)
         rightgripclosed = True
     else:
@@ -158,16 +158,16 @@ def closeGrips():
 def rotateCubeToRight():
     closeRightGrip()
     openLeftGrip()
-    time.sleep(0.5)
     turnWrist(rightwristservo)
-    time.sleep(0.5)
+    time.sleep(3)
     closeLeftGrip()
     time.sleep(1)
     openRightGrip()
-    time.sleep(1)
+    time.sleep(0.5)
     centerWrist(rightwristservo)
     time.sleep(0.5)
     closeRightGrip()
+    time.sleep(0.5)
     
     
 def rotateCubeToLeft():
@@ -213,9 +213,11 @@ def rotateCubeUpToLeft():
     time.sleep(0.5)
     closeLeftGrip()
     
-def rotateCubeToFront():
+def rotateCubeUpToFront():
     rotateCubeUpToRight()
+    time.sleep(2)
     rotateCubeToLeft()
+    time.sleep(2)
     rotateCubeUpToRight()
     
 
@@ -372,32 +374,30 @@ def start():
 def stop():
     print("Stop cube detection")
     openGrips()
+
     
 def test():
-#     openRightGrip()
-#     time.sleep(5)
-#     closeRightGrip()
-#     turnWrist(rightwristservo)
-#     time.sleep(2)
-#     centerWrist(rightwristservo)
-#     time.sleep(2)
-#     turnPrimaWrist(rightwristservo)
-#     time.sleep(2)
-#     centerWrist(rightwristservo)
-#     time.sleep(2)
-#     openRightGrip()
-#     centerWrist(leftwristservo)
-    openLeftGrip()
+    closeGrips()
     time.sleep(5)
-    closeLeftGrip()
-#     turnWrist(leftwristservo)
-#     time.sleep(2)
-#     centerWrist(leftwristservo)
-#     time.sleep(2)
-#     turnPrimaWrist(leftwristservo)
-#     time.sleep(2)
-#     centerWrist(leftwristservo)
-#     time.sleep(2)
+    openGrips()
+    openRightGrip()
+    time.sleep(5)
+    turnWrist(rightwristservo)
+    time.sleep(2)
+    centerWrist(rightwristservo)
+    time.sleep(2)
+    turnPrimaWrist(rightwristservo)
+    time.sleep(2)
+    centerWrist(rightwristservo)
+    time.sleep(2)
+    turnWrist(leftwristservo)
+    time.sleep(2)
+    centerWrist(leftwristservo)
+    time.sleep(2)
+    turnPrimaWrist(leftwristservo)
+    time.sleep(2)
+    centerWrist(leftwristservo)
+    time.sleep(2)
     
 def test2():
     time.sleep(2)
@@ -469,23 +469,35 @@ def captureRubikFaces():
 #     strCube = strCube + buildStringFace(face)
     faces = np.empty(6, dtype=object)
     ##First face
-    face[0] = captureRubikFace()
+    faces[0] = captureRubikFace()
+    print("1 - "+buildStringFace(faces[0]))
+    drawText(buildStringFace(faces[0]), draw, image)
     ##Second face
     rotateCubeToRight()
-    face[1] = captureRubikFace()
+    faces[1] = captureRubikFace()
+    print("2 - "+buildStringFace(faces[1]))
+    drawText(buildStringFace(faces[1]), draw, image)   
     ##Third face
     rotateCubeToRight()
-    face[2] = captureRubikFace()
+    faces[2] = captureRubikFace()
+    print("3 - "+buildStringFace(faces[2]))
+    drawText(buildStringFace(faces[2]), draw, image)    
     ##Fourth face
     rotateCubeToRight()
-    face[3] = captureRubikFace()
+    faces[3] = captureRubikFace()
+    print("4 - "+buildStringFace(faces[3]))
+    drawText(buildStringFace(faces[3]), draw, image)    
     ##Fifth face
     rotateCubeUpToFront()
-    face[4] = captureRubikFace()
+    faces[4] = captureRubikFace()
+    print("5 - "+buildStringFace(faces[4]))
+    drawText(buildStringFace(faces[4]), draw, image)    
     ##Sixth face
     rotateCubeToRight()
     rotateCubeToRight()
-    face[5] = captureRubikFace()
+    faces[5] = captureRubikFace()
+    print("6 - "+buildStringFace(faces[4]))
+    drawText(buildStringFace(faces[4]), draw, image)    
     rotateCubeUpToFront()
     rotateCubeToRight()
     cube = formatFacesToStr(faces)
@@ -497,9 +509,9 @@ def captureRubikFaces():
 
 draw, image = drawInit()
 cube = 'oyyoyyoyygggggggggwoowoowoobbbbbbbbbrryrryrryrwwrwwrww'
-solution = utils.solve(cube, 'Kociemba')
-print(solution)
-#movement(solution)
+#solution = utils.solve(cube, 'Kociemba')
+#print(solution)
+
 
 
 #exit()
@@ -507,6 +519,20 @@ print(solution)
 #openGrips()
 status = 0
 drawText("menu>\n->Close grips", draw, image)
+#test()
+#GPIO.cleanup(startButton)
+#GPIO.cleanup(selectButton)
+#exit()
+# test()
+#time.sleep(5)
+
+#closeGrips()
+#time.sleep(5)
+#rotateCubeUpToFront()
+#time.sleep(10)
+#openGrips()
+captureRubikFace()
+exit()
 while True:
     startValue= GPIO.input(startButton)
     selectValue= GPIO.input(selectButton)
@@ -530,10 +556,12 @@ while True:
         drawText("menu>\n->Close grips", draw, image)
     elif ((startValue==0) and (status==1)):
         drawText("Detecting Cube...", draw, image)
-        faces = np.empty(1, dtype=object)
-        faces[0] = captureRubikFace()
-        print(buildStringFace(faces[0]))
-        drawText(buildStringFace(faces[0]), draw, image)
+        strFaces = captureRubikFaces()
+        print(strFaces)
+        #faces = np.empty(1, dtype=object)
+        #faces[0] = captureRubikFace()
+        #print(buildStringFace(faces[0]))
+        #drawText(buildStringFace(faces[0]), draw, image)
         time.sleep(5)
         #drawText("menu>\n->Detect cube", draw, image)
     elif ((startValue==0) and (status==2)):
@@ -541,9 +569,9 @@ while True:
         openGrips()
         time.sleep(1)
         drawText("Exit...", draw, image)
-        GPIO.cleanup(startButton)
-        GPIO.cleanup(selectButton)
-        exit()
+       # GPIO.cleanup(startButton)
+       # GPIO.cleanup(selectButton)
+       # exit()
     else:
 #        test2()
 #         Bprima_movement()

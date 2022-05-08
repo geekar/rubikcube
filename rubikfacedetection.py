@@ -36,6 +36,10 @@ DS_MIN_AREA_RATIO = 0.68
 DS_MIN_SQUARE_SIZE = 0.2 #times the width of image
 DS_MAX_SQUARE_SIZE = 0.3
 
+centers_showcolors = []
+radius_showcolors = []
+colors_showcolors = []
+
 def detectColor(h,s,v):
     for color, (lower, upper) in colors.items():
         lower = np.array(lower, dtype=np.uint8)
@@ -84,20 +88,13 @@ def mshow(im, titles = None):
         
 
 def index_to_cube(pts):
-    print("pts=")
-    print(pts)
-    print(len(pts))
-    
-
     if len(pts) != 9:
         return None
     
     pts = [list(pts[i])+[i] for i in range(len(pts))]
     pts.sort(key=itemgetter(1))
     mat = [[pts[3*i+j] for j in range(3)] for i in range(3)]
-    print("mat=")
-    print(mat)
-    
+
     for i in range(3):
         mat[i].sort(key=itemgetter(0))
 
@@ -151,6 +148,8 @@ def colorNombreLargo(color_name):
     return switcher.get(color_name)
 
 
+
+
 #accepts BGR image
 def detect_square(img, color_name, maskBorders, isBGR=True):
     im = img.copy()
@@ -201,6 +200,11 @@ def detect_square(img, color_name, maskBorders, isBGR=True):
 
     
     conts = remove_bad_contours(conts)
+    
+    for cont in conts:
+        centers_showcolors.append(tuple(np.array(cv2.minAreaRect(cont)[0],dtype=int)))
+        radius_showcolors.append(int(pow(cv2.contourArea(cont)/3.14159, 0.5)))
+        colors_showcolors.append(color_name)
 
     if DEBUG_SHOW_INSIDE_FUNC:
         im2 = np.array(im)
@@ -212,15 +216,38 @@ def detect_square(img, color_name, maskBorders, isBGR=True):
                        int(pow(cv2.contourArea(cont)/3.14159, 0.5)), (255,255,255),thickness=2)
         #mshow(cv2.cvtColor(im2, cv2.COLOR_HSV2RGB))
         mshow(cv2.cvtColor(im2, cv2.COLOR_HSV2RGB), 'COLOR ' + colorNombreLargo(color_name))
-        
-       
-       
+    
 
     return [cv2.minAreaRect(cont) for cont in conts]
 
+def showColorsDetected(img):
+    im2 = np.array(img)
+    
+    global centers_showcolors
+    global radius_showcolors
+    global colors_showcolors
+    
+    i = 0
+    for center in centers_showcolors:
+        #print(pos)
+        getColorName(im2,center[0],center[1])
+        cv2.circle(im2, center,
+                   radius_showcolors[i], (255,255,255),thickness=2)
+        cv2.rectangle(im2, (center[0]-30, center[1]-30), (center[0]+30, center[1] + 30), (0,0,0), -1)
+        cv2.putText(im2, colors_showcolors[i],(center[0]-10, center[1]),cv2.FONT_HERSHEY_TRIPLEX,1,(255,255,255),2)
+       
+        i = i+1
+    #mshow(cv2.cvtColor(im2, cv2.COLOR_HSV2RGB))
+    #mshow(cv2.cvtColor(im2, cv2.COLOR_BGR2RGB), 'COLORS DETECTED')
+    
+    centers_showcolors = []
+    radius_showcolors = []
+    colors_showcolors = []
+    return im2
+
 #accepts BGR
 def get_cube_state(im, imborders):
-
+    DEBUG_SHOW_INSIDE_FUNC = True
     colors_detected = []
     cube_state = [[None]*3 for _ in range(3)]
     
@@ -231,6 +258,9 @@ def get_cube_state(im, imborders):
         
     #from pprint import pprint
     print(colors_detected)
+    
+    if DEBUG_SHOW_INSIDE_FUNC:
+      im = showColorsDetected(im)
 
     index_mat = index_to_cube([prop[1][0] for prop in colors_detected])
     
@@ -241,7 +271,8 @@ def get_cube_state(im, imborders):
             for j in range(3):
                 cube_state[i][j] = colors_detected[index_mat[i][j]][0]
 
-        return cube_state,len(colors_detected)
+
+        return cube_state,len(colors_detected),im
     else:
         return None
     
@@ -486,7 +517,7 @@ def detectFacefromImage(imgBGR):
     nfaces = 0
     cv2.waitKey(0)    
 #    face,img = findsCandidateEdges(imgClean,imgBGR)
-    face,nfaces = get_cube_state(imgBGR,imgClean)
+    face,nfaces,imgBGR = get_cube_state(imgBGR,imgClean)
     cv2.imshow("imageDetect", imgBGR)
 #     cv2.imshow("imageColor", img)
     cv2.waitKey(0)
