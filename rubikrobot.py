@@ -499,33 +499,33 @@ def captureRubikFaces():
     ##First face
     faces[0] = captureRubikFace()
     print("1 - "+buildStringFace(faces[0]))
-    drawText(buildStringFace(faces[0]), draw, image)
+    drawFace(buildStringFace(faces[0]), draw, image)
     ##Second face
     rotateCubeToRight()
     faces[1] = captureRubikFace()
     print("2 - "+buildStringFace(faces[1]))
-    drawText(buildStringFace(faces[1]), draw, image)   
+    drawFace(buildStringFace(faces[1]), draw, image)   
     ##Third face
     rotateCubeToRight()
     faces[2] = captureRubikFace()
     print("3 - "+buildStringFace(faces[2]))
-    drawText(buildStringFace(faces[2]), draw, image)    
+    drawFace(buildStringFace(faces[2]), draw, image)    
     ##Fourth face
     rotateCubeToRight()
     faces[3] = captureRubikFace()
     print("4 - "+buildStringFace(faces[3]))
-    drawText(buildStringFace(faces[3]), draw, image)    
+    drawFace(buildStringFace(faces[3]), draw, image)    
     ##Fifth face
     rotateCubeUpToFront()
     faces[4] = captureRubikFace()
     print("5 - "+buildStringFace(faces[4]))
-    drawText(buildStringFace(faces[4]), draw, image)    
+    drawFace(buildStringFace(faces[4]), draw, image)    
     ##Sixth face
     rotateCubeToRight()
     rotateCubeToRight()
     faces[5] = captureRubikFace()
     print("6 - "+buildStringFace(faces[4]))
-    drawText(buildStringFace(faces[4]), draw, image)    
+    drawFace(buildStringFace(faces[4]), draw, image)    
     rotateCubeUpToFront()
     rotateCubeToRight()
     cube = formatFacesToStr(faces)
@@ -565,16 +565,16 @@ status = 0
 drawText("menu>\n->Close grips", draw, image)
 time.sleep(1)
 
-obj = CubeData("yyybbbwww",True)
-save_object(obj)
-
-strFace = "gggrrrbbb"
-
+# obj = CubeData("yyybbbwww",False)
+# save_object(obj)
+# 
+# strFace = "gggrrrbbb"
+# 
 obj = load_object("datacube.pickle")
-if obj.solved is True:
-    strFace = obj.solution
-
-drawFace(strFace,draw,image)
+# if obj.solved is True:
+#     strFace = obj.solution
+# 
+# drawFace(strFace,draw,image)
 
 
 #test()
@@ -590,13 +590,15 @@ drawFace(strFace,draw,image)
 #time.sleep(10)
 #openGrips()
 # captureRubikFace()
-exit()
 while True:
     startValue= GPIO.input(startButton)
     selectValue= GPIO.input(selectButton)
     if (selectValue== 0):
         print("Boton up")
-        status = (status+1)% 3
+        if obj.solved is False:
+            status = (status+1)% 3
+        elif obj.solved is False:
+            status = (status+1)% 4
         if (status == 0):
             print("menu>\n->Close grips")
             drawText("menu>\n->Close grips", draw, image)
@@ -605,7 +607,10 @@ while True:
             drawText("menu>\n->Detect cube", draw, image)
         elif (status == 2):
             print("menu>\n->Open grips")
-            drawText("menu>\n->Open grips", draw, image)         
+            drawText("menu>\n->Open grips", draw, image)
+        elif (status == 3):
+            print("menu>\n->Resolve cube")
+            drawText("menu>\n->Resolve cube", draw, image)     
     if ((startValue==0) and (status==0)):
         print("Closing grips...")
         drawText("Closing grips...", draw, image)
@@ -620,8 +625,11 @@ while True:
         #faces[0] = captureRubikFace()
         #print(buildStringFace(faces[0]))
         #drawText(buildStringFace(faces[0]), draw, image)
+        drawText("Cube Detected", draw, image)
+        obj = CubeData(strFaces,True)
         time.sleep(5)
-        #drawText("menu>\n->Detect cube", draw, image)
+        status = 3
+        drawText("menu>\n->Sove cube", draw, image)
     elif ((startValue==0) and (status==2)):
         drawText("Opening grips...", draw, image)
         openGrips()
@@ -631,6 +639,15 @@ while True:
        # GPIO.cleanup(startButton)
        # GPIO.cleanup(selectButton)
        # exit()
+    elif ((startValue==0) and (status==3)):
+        cube = obj.solution
+        solution = utils.solve(cube, 'Kociemba')
+        print(solution)
+        solve(solution)
+        #obj = CubeData("",False)
+        #save_object(obj)
+        drawText("menu>\n->Open grips", draw, image)
+        status = 2
     else:
 #        test2()
 #         Bprima_movement()
