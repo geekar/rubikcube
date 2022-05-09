@@ -9,12 +9,14 @@ import Adafruit_PCA9685
 import time
 import RPi.GPIO as GPIO
 import Adafruit_SSD1306
+import pickle
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 from rubik_solver import utils
 import rubikfacedetection
 from rubikfacedetection import *
+
 
 # Initialise the PCA9685 using desired address and/or bus:
 pwm = Adafruit_PCA9685.PCA9685(address = 0x40, busnum = 1)
@@ -530,8 +532,24 @@ def captureRubikFaces():
     return cube
 
 
+class CubeData():
+    def __init__(self, solution, solved):
+        self.solution = solution
+        self.solved = solved
+ 
+def save_object(obj):
+    try:
+        with open("datacube.pickle", "wb") as f:
+            pickle.dump(obj, f, protocol=pickle.HIGHEST_PROTOCOL)
+    except Exception as ex:
+        print("Error during pickling object (Possibly unsupported):", ex)
 
-
+def load_object(filename):
+    try:
+        with open(filename, "rb") as f:
+            return pickle.load(f)
+    except Exception as ex:
+        print("Error during unpickling object (Possibly unsupported):", ex)
 
 draw, image = drawInit()
 cube = 'oyyoyyoyygggggggggwoowoowoobbbbbbbbbrryrryrryrwwrwwrww'
@@ -546,7 +564,19 @@ cube = 'oyyoyyoyygggggggggwoowoowoobbbbbbbbbrryrryrryrwwrwwrww'
 status = 0
 drawText("menu>\n->Close grips", draw, image)
 time.sleep(1)
-drawFace("gggrrrbbb",draw,image)
+
+obj = CubeData("yyybbbwww",True)
+save_object(obj)
+
+strFace = "gggrrrbbb"
+
+obj = load_object("datacube.pickle")
+if obj.solved is True:
+    strFace = obj.solution
+
+drawFace(strFace,draw,image)
+
+
 #test()
 #GPIO.cleanup(startButton)
 #GPIO.cleanup(selectButton)
