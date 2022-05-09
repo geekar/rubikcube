@@ -43,6 +43,8 @@ leftwristcenter = False
 
 
 
+
+
 def offset(grados):
 	return (round ((servo_max - servo_min) * grados / 180))
 
@@ -219,6 +221,9 @@ def rotateCubeUpToFront():
     rotateCubeToLeft()
     time.sleep(2)
     rotateCubeUpToRight()
+    openRightGrip()
+    time.sleep(1)
+    closeRightGrip()
     
 
 def D_movement():
@@ -423,9 +428,29 @@ def drawText(str, draw, image):
     padding=-2
     top=padding
     x=0
-    font=ImageFont.load_default()
+    #font=ImageFont.load_default()
+    font = ImageFont.truetype('Minecraftia.ttf', 8)
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
     draw.text((x, top), str, font=font,  fill=255)
+    disp.image(image)
+    disp.display()
+    time.sleep(.1)
+    
+def drawFace(str, draw, image):
+    row1 = str[0:3]
+    row2 = str[3:6]
+    row3 = str[6:9]
+    width=disp.width
+    height=disp.height
+    padding=-2
+    top=padding
+    x=0
+    #font=ImageFont.load_default()
+    font = ImageFont.truetype('Minecraftia.ttf', 18)
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    draw.text((x+45, top), row1, font=font,  fill=255)
+    draw.text((x+45, top+20), row2, font=font,  fill=255)
+    draw.text((x+45, top+40), row3, font=font,  fill=255)
     disp.image(image)
     disp.display()
     time.sleep(.1)
@@ -461,7 +486,8 @@ def formatFacesToStr(faces):
     strCube = ""
     for face in faces:
         strCube = strCube + buildStringFace(face)
-    return strCube    
+    return strCube
+    
         
 def captureRubikFaces():
 #     strCube = ""
@@ -519,6 +545,8 @@ cube = 'oyyoyyoyygggggggggwoowoowoobbbbbbbbbrryrryrryrwwrwwrww'
 #openGrips()
 status = 0
 drawText("menu>\n->Close grips", draw, image)
+time.sleep(1)
+drawFace("gggrrrbbb",draw,image)
 #test()
 #GPIO.cleanup(startButton)
 #GPIO.cleanup(selectButton)
@@ -531,7 +559,7 @@ drawText("menu>\n->Close grips", draw, image)
 #rotateCubeUpToFront()
 #time.sleep(10)
 #openGrips()
-captureRubikFace()
+# captureRubikFace()
 exit()
 while True:
     startValue= GPIO.input(startButton)
@@ -568,7 +596,8 @@ while True:
         drawText("Opening grips...", draw, image)
         openGrips()
         time.sleep(1)
-        drawText("Exit...", draw, image)
+        status = 0
+        drawText("menu>\n->Close grips", draw, image)
        # GPIO.cleanup(startButton)
        # GPIO.cleanup(selectButton)
        # exit()

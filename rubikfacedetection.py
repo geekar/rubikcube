@@ -153,8 +153,8 @@ def colorNombreLargo(color_name):
 #accepts BGR image
 def detect_square(img, color_name, maskBorders, isBGR=True):
     im = img.copy()
-    DEBUG_SHOW_MASK = True
-    DEBUG_SHOW_INSIDE_FUNC = True
+    DEBUG_SHOW_MASK = False
+    DEBUG_SHOW_INSIDE_FUNC = False
 
     def remove_bad_contours(conts):
         new_conts = []
