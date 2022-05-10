@@ -108,12 +108,12 @@ def closeLeftGrip():
 def openRightGrip():
     global rightgripclosed
     if rightgripclosed:    
-        for i in range(40):
+        for i in range(41):
             moveForwardGrips(rightgripservo,i)
             time.sleep(0.01)
         rightgripclosed = False
     else:
-        moveForwardGrips(rightgripservo,40)
+        moveForwardGrips(rightgripservo,41)
     
         
 def closeRightGrip():
@@ -127,10 +127,10 @@ def closeRightGrip():
         moveForwardGrips(rightgripservo,0)
         
 def turnWrist(servo):
-    moveForward(servo,180)
+    moveForward(servo,175)
 
 def turnPrimaWrist(servo):
-    moveForward(servo,0)
+    moveForward(servo,5)
                 
 def centerWrist(servo):
     moveForward(servo,90)
@@ -218,14 +218,25 @@ def rotateCubeUpToLeft():
     closeLeftGrip()
     
 def rotateCubeUpToFront():
-    rotateCubeUpToRight()
+    rotateCubeUpToLeft()
+    openRightGrip()
+    time.sleep(1)
+    closeRightGrip()    
     time.sleep(2)
-    rotateCubeToLeft()
-    time.sleep(2)
+    rotateCubeToRight()
     rotateCubeUpToRight()
     openRightGrip()
     time.sleep(1)
     closeRightGrip()
+
+def rotateCubeFrontToUp():
+    rotateCubeToRight()
+    rotateCubeUpToLeft()
+    openRightGrip()
+    time.sleep(1)
+    closeRightGrip()
+    rotateCubeToLeft()
+ 
     
 
 def D_movement():
@@ -490,8 +501,46 @@ def formatFacesToStr(faces):
         strCube = strCube + buildStringFace(face)
     return strCube
     
-        
 def captureRubikFaces():
+    faces = np.empty(6, dtype=object)
+    ##First face
+    rotateCubeUpToFront()
+    faces[0] = captureRubikFace()
+    print("1 - "+buildStringFace(faces[0]))
+    drawFace(buildStringFace(faces[0]), draw, image)
+    ##Second face
+    rotateCubeFrontToUp
+    rotateCubeToRight()
+    faces[1] = captureRubikFace()
+    print("2 - "+buildStringFace(faces[1]))
+    drawFace(buildStringFace(faces[1]), draw, image)   
+    ##Third face
+    rotateCubeToLeft()
+    faces[2] = captureRubikFace()
+    print("3 - "+buildStringFace(faces[2]))
+    drawFace(buildStringFace(faces[2]), draw, image)    
+    ##Fourth face
+    rotateCubeToLeft()
+    faces[3] = captureRubikFace()
+    print("4 - "+buildStringFace(faces[3]))
+    drawFace(buildStringFace(faces[3]), draw, image)    
+    ##Fifth face
+    rotateCubeToLeft()
+    faces[4] = captureRubikFace()
+    print("5 - "+buildStringFace(faces[4]))
+    drawFace(buildStringFace(faces[4]), draw, image)    
+    ##Sixth face
+    rotateCubeToRight()
+    rotateCubeToRight()
+    rotateCubeFrontToUp()
+    faces[5] = captureRubikFace()
+    print("6 - "+buildStringFace(faces[4]))
+    drawFace(buildStringFace(faces[4]), draw, image)    
+    rotateCubeUpToFront()
+    cube = formatFacesToStr(faces)
+    return cube
+        
+def captureRubikFacesOld():
 #     strCube = ""
 #     face = captureRubikFace()
 #     strCube = strCube + buildStringFace(face)
@@ -516,6 +565,7 @@ def captureRubikFaces():
     print("4 - "+buildStringFace(faces[3]))
     drawFace(buildStringFace(faces[3]), draw, image)    
     ##Fifth face
+    rotateCubeToRight()
     rotateCubeUpToFront()
     faces[4] = captureRubikFace()
     print("5 - "+buildStringFace(faces[4]))
@@ -523,18 +573,25 @@ def captureRubikFaces():
     ##Sixth face
     rotateCubeToRight()
     rotateCubeToRight()
+    rotateCubeUpToLeft()
+    openRightGrip()
+    time.sleep(1)
+    closeRightGrip()   
+    rotateCubeUpToLeft()
+    openRightGrip()
+    time.sleep(1)
+    closeRightGrip()   
     faces[5] = captureRubikFace()
     print("6 - "+buildStringFace(faces[4]))
     drawFace(buildStringFace(faces[4]), draw, image)    
     rotateCubeUpToFront()
-    rotateCubeToRight()
     cube = formatFacesToStr(faces)
     return cube
 
 
 class CubeData():
-    def __init__(self, solution, solved):
-        self.solution = solution
+    def __init__(self, cube, solved):
+        self.cube = cube
         self.solved = solved
  
 def save_object(obj):
@@ -552,9 +609,13 @@ def load_object(filename):
         print("Error during unpickling object (Possibly unsupported):", ex)
 
 draw, image = drawInit()
-cube = 'oyyoyyoyygggggggggwoowoowoobbbbbbbbbrryrryrryrwwrwwrww'
-#solution = utils.solve(cube, 'Kociemba')
-#print(solution)
+#cube = 'oyyoyyoyygggggggggwoowoowoobbbbbbbbbrryrryrryrwwrwwrww'
+#cube = 'ooorrrrrryyywwwwwwrrroooooowwwyyyyyybbbbbbbbbggggggggg'
+cube = 'yyyyyyyyybbbbbbbbbrrrrrrrrrgggggggggooooooooowwwwwwwww'
+
+
+solution = utils.solve(cube, 'Kociemba')
+print(solution)
 
 
 
@@ -584,12 +645,12 @@ obj = load_object("datacube.pickle")
 # test()
 #time.sleep(5)
 
-#closeGrips()
-#time.sleep(5)
-#rotateCubeUpToFront()
+
 #time.sleep(10)
 #openGrips()
 # captureRubikFace()
+# test()
+exit()
 while True:
     startValue= GPIO.input(startButton)
     selectValue= GPIO.input(selectButton)
@@ -597,7 +658,8 @@ while True:
         print("Boton up")
         if obj.solved is False:
             status = (status+1)% 3
-        elif obj.solved is False:
+        elif obj.solved is True:
+            print (obj.cube)
             status = (status+1)% 4
         if (status == 0):
             print("menu>\n->Close grips")
@@ -621,15 +683,12 @@ while True:
         drawText("Detecting Cube...", draw, image)
         strFaces = captureRubikFaces()
         print(strFaces)
-        #faces = np.empty(1, dtype=object)
-        #faces[0] = captureRubikFace()
-        #print(buildStringFace(faces[0]))
-        #drawText(buildStringFace(faces[0]), draw, image)
         drawText("Cube Detected", draw, image)
         obj = CubeData(strFaces,True)
         time.sleep(5)
         status = 3
-        drawText("menu>\n->Sove cube", draw, image)
+        save_object(obj)
+        drawText("menu>\n->Solve cube", draw, image)
     elif ((startValue==0) and (status==2)):
         drawText("Opening grips...", draw, image)
         openGrips()
@@ -640,7 +699,7 @@ while True:
        # GPIO.cleanup(selectButton)
        # exit()
     elif ((startValue==0) and (status==3)):
-        cube = obj.solution
+        cube = obj.cube
         solution = utils.solve(cube, 'Kociemba')
         print(solution)
         solve(solution)
