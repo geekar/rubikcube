@@ -16,11 +16,11 @@ colors = {
     'g3': ([125,7, 105], [127, 8, 109]),    # Green
     'g4': ([81,14, 55], [170, 32, 65]),    # Green
     'y': ([22, 35, 114], [39, 255, 255]),   # Yellow
-    'o1': ([1, 20, 114], [23, 255, 255]),     # Orange
-    'o2': ([170, 50, 205], [179, 255, 255]),     # Orange
+    'o1': ([0, 200, 114], [23, 245, 255]),     # Orange
+    'o2': ([170, 200, 210], [179, 245, 255]),     # Orange
     'r1': ([0, 70, 20], [10, 250, 200]),     # Red
-    'r2': ([159, 70, 80], [179, 255, 209]),     # Red
-    'r3': ([159, 70, 80], [179, 255, 209]),    # Red
+    'r2': ([159, 182, 80], [179, 224, 239]),     # Red
+    'r3': ([159, 182, 80], [179, 224, 239]),    # Red
     
    # 'r3': ([160, 150, 100], [180, 255, 255]),     # Red  
     'w': ([0, 0, 125], [179, 45, 255])        #White
@@ -28,12 +28,12 @@ colors = {
 
 color_names = ['b','g','y','o','r','w']
 
-DS_SQUARE_SIDE_RATIO = 1.5
+DS_SQUARE_SIDE_RATIO = 1.55
 DS_MORPH_KERNEL_SIZE = 5
 DS_MORPH_ITERATIONS = 2
 DS_MIN_SQUARE_LENGTH_RATIO = 0.08
-DS_MIN_AREA_RATIO = 0.68
-DS_MIN_SQUARE_SIZE = 0.2 #times the width of image
+DS_MIN_AREA_RATIO = 0.67
+DS_MIN_SQUARE_SIZE = 0.15 #times the width of image
 DS_MAX_SQUARE_SIZE = 0.3
 
 centers_showcolors = []

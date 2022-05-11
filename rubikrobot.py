@@ -108,19 +108,19 @@ def closeLeftGrip():
 def openRightGrip():
     global rightgripclosed
     if rightgripclosed:    
-        for i in range(41):
+        for i in range(40):
             moveForwardGrips(rightgripservo,i)
             time.sleep(0.01)
         rightgripclosed = False
     else:
-        moveForwardGrips(rightgripservo,41)
+        moveForwardGrips(rightgripservo,40)
     
         
 def closeRightGrip():
     global rightgripclosed
     if not rightgripclosed:    
-        for i in range(39):
-            moveForwardGrips(rightgripservo,39-i)
+        for i in range(40):
+            moveForwardGrips(rightgripservo,40-i)
             time.sleep(0.02)
         rightgripclosed = True
     else:
@@ -240,9 +240,8 @@ def rotateCubeFrontToUp():
     
 
 def D_movement():
-    closeRightGrip()
     turnWrist(rightwristservo)
-    time.sleep(0.5)
+    time.sleep(3)
     openRightGrip()
     time.sleep(1)
     centerWrist(rightwristservo)
@@ -306,11 +305,15 @@ def Ldouble_movement():
     rotateCubeUpToRight()
     
 def R_movement():
+    print("inicio r movement")
     rotateCubeUpToRight()
+    print("terminada fase 1 r movement")
     time.sleep(1)
     D_movement()
+    print("terminada fase 2 r movement")
     time.sleep(1)
     rotateCubeUpToLeft()
+    print("terminada fase 3 r movement")
 
 def Rprima_movement():
     rotateCubeUpToRight()
@@ -469,30 +472,48 @@ def drawFace(str, draw, image):
     time.sleep(.1)
     
 def movement(letter):
-    switcher = {
-       "L": L_movement(),
-       "L'": Lprima_movement(),
-       "L2": Ldouble_movement(),
-       "R": R_movement(),
-       "R'": Rprima_movement(),
-       "R2": Rdouble_movement(),
-       "U": U_movement(),
-       "U'": Uprima_movement(),
-       "U2": Udouble_movement(),
-       "D": D_movement(),
-       "D'": Dprima_movement(),
-       "D2": Ddouble_movement(),
-       "F": F_movement(),
-       "F'": Fprima_movement(),
-       "F2": Fdouble_movement(),
-       "B": B_movement(),
-       "B'": Bprima_movement(),
-       "B2": Bdouble_movement(),       
-    }
-    return switcher.get(letter, "Invalid Operation! Please try again.")
+   if (letter == "L"):
+       L_movement()
+   elif (letter == "L'"):
+       Lprima_movement()
+   elif (letter == "L2"):    
+       Ldouble_movement()
+   elif (letter == "R"):        
+       R_movement()
+   elif (letter == "R'"):            
+       prima_movement(),
+   elif (letter == "R2"):        
+       Rdouble_movement()
+   elif (letter == "U"):         
+       U_movement()
+   elif (letter == "U'"):        
+       Uprima_movement()
+   elif (letter == "U2"):        
+       Udouble_movement()
+   elif (letter == "D"):        
+       D_movement()
+   elif (letter == "D'"):       
+       Dprima_movement()
+   elif (letter == "D2"):     
+       Ddouble_movement()
+   elif (letter == "F"):       
+       F_movement()
+   elif (letter == "F'"):        
+       Fprima_movement()
+   elif (letter == "F2"):       
+       Fdouble_movement()
+   elif (letter == "B"):         
+       B_movement()
+   elif (letter == "B'"):       
+       Bprima_movement()
+   elif (letter == "B2"):    
+       Bdouble_movement()     
+   else: 
+       print("Invalid Operation! Please try again.")
 
 def solve(solution):
     for letter in solution:
+        print(letter)
         movement(letter)
         
 def formatFacesToStr(faces):
@@ -501,7 +522,7 @@ def formatFacesToStr(faces):
         strCube = strCube + buildStringFace(face)
     return strCube
     
-def captureRubikFaces():
+def captureRubikFacesNew():
     faces = np.empty(6, dtype=object)
     ##First face
     rotateCubeUpToFront()
@@ -539,7 +560,7 @@ def captureRubikFaces():
     rotateCubeUpToFront()
     cube = formatFacesToStr(faces)
     return cube
-        
+
 def captureRubikFacesOld():
 #     strCube = ""
 #     face = captureRubikFace()
@@ -587,6 +608,54 @@ def captureRubikFacesOld():
     rotateCubeUpToFront()
     cube = formatFacesToStr(faces)
     return cube
+        
+def captureRubikFaces():
+#     strCube = ""
+#     face = captureRubikFace()
+#     strCube = strCube + buildStringFace(face)
+    faces = np.empty(6, dtype=object)
+    ##First face
+    faces[2] = captureRubikFace()
+    print("1 - "+buildStringFace(faces[2]))
+    drawFace(buildStringFace(faces[2]), draw, image)
+    ##Second face
+    rotateCubeToRight()
+    faces[1] = captureRubikFace()
+    print("2 - "+buildStringFace(faces[1]))
+    drawFace(buildStringFace(faces[1]), draw, image)   
+    ##Third face
+    rotateCubeToRight()
+    faces[4] = captureRubikFace()
+    print("3 - "+buildStringFace(faces[4]))
+    drawFace(buildStringFace(faces[4]), draw, image)    
+    ##Fourth face
+    rotateCubeToRight()
+    faces[3] = captureRubikFace()
+    print("4 - "+buildStringFace(faces[3]))
+    drawFace(buildStringFace(faces[3]), draw, image)    
+    ##Fifth face
+    rotateCubeToRight()
+    rotateCubeUpToFront()
+    faces[0] = captureRubikFace()
+    print("5 - "+buildStringFace(faces[0]))
+    drawFace(buildStringFace(faces[0]), draw, image)    
+    ##Sixth face
+    rotateCubeToRight()
+    rotateCubeToRight()
+    rotateCubeUpToLeft()
+    openRightGrip()
+    time.sleep(1)
+    closeRightGrip()   
+    rotateCubeUpToLeft()
+    openRightGrip()
+    time.sleep(1)
+    closeRightGrip()   
+    faces[5] = captureRubikFace()
+    print("6 - "+buildStringFace(faces[5]))
+    drawFace(buildStringFace(faces[5]), draw, image)    
+    rotateCubeUpToFront()
+    cube = formatFacesToStr(faces)
+    return cube
 
 
 class CubeData():
@@ -612,14 +681,22 @@ draw, image = drawInit()
 #cube = 'oyyoyyoyygggggggggwoowoowoobbbbbbbbbrryrryrryrwwrwwrww'
 #cube = 'ooorrrrrryyywwwwwwrrroooooowwwyyyyyybbbbbbbbbggggggggg'
 cube = 'yyyyyyyyybbbbbbbbbrrrrrrrrrgggggggggooooooooowwwwwwwww'
+#cube = 'yyoyyoyyobbbbbbbbbrryrryrrygggggggggwoowoowoowwrwwrwwr'
 
 
 solution = utils.solve(cube, 'Kociemba')
 print(solution)
 
-
-
-#exit()
+# openGrips()
+# time.sleep(2)
+# closeGrips()
+# time.sleep(5)
+# D_movement()
+# time.sleep(10)
+# openGrips()
+# 
+# 
+# exit()
 
 #openGrips()
 status = 0
@@ -649,8 +726,7 @@ obj = load_object("datacube.pickle")
 #time.sleep(10)
 #openGrips()
 # captureRubikFace()
-# test()
-exit()
+
 while True:
     startValue= GPIO.input(startButton)
     selectValue= GPIO.input(selectButton)
