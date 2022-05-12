@@ -267,6 +267,7 @@ def B_movement():
     openLeftGrip()
     time.sleep(1)
     centerWrist(leftwristservo)
+    time.sleep(1)
     closeLeftGrip()
 
 def Bprima_movement():
@@ -280,7 +281,9 @@ def Bprima_movement():
 
 def Bdouble_movement():
     B_movement()
+    time.sleep(1)
     B_movement()
+    time.sleep(1)
     
 def L_movement():
     rotateCubeUpToLeft()
@@ -288,6 +291,7 @@ def L_movement():
     D_movement()
     time.sleep(1)
     rotateCubeUpToRight()
+    time.sleep(1)
 
 def Lprima_movement():
     rotateCubeUpToLeft()
@@ -295,14 +299,17 @@ def Lprima_movement():
     Dprima_movement()
     time.sleep(1)
     rotateCubeUpToRight()
+    time.sleep(1)
     
 def Ldouble_movement():
     rotateCubeUpToLeft()
     time.sleep(1)
     D_movement()
+    time.sleep(1)
     D_movement()
     time.sleep(1)
     rotateCubeUpToRight()
+    time.sleep(1)
     
 def R_movement():
     print("inicio r movement")
@@ -314,6 +321,7 @@ def R_movement():
     time.sleep(1)
     rotateCubeUpToLeft()
     print("terminada fase 3 r movement")
+    time.sleep(1)
 
 def Rprima_movement():
     rotateCubeUpToRight()
@@ -321,41 +329,50 @@ def Rprima_movement():
     Dprima_movement()
     time.sleep(1)
     rotateCubeUpToLeft()
+    time.sleep(1)
 
 def Rdouble_movement():
     rotateCubeUpToRight()
     time.sleep(1)
     D_movement()
+    time.sleep(1)
     D_movement()
     time.sleep(1)
-    rotateCubeUpToLeft()  
+    rotateCubeUpToLeft()
+    time.sleep(1)
     
 def U_movement():
     rotateCubeUpToRight()
+    time.sleep(1)
     rotateCubeUpToRight()
     time.sleep(1)
     D_movement()
     time.sleep(1)
     rotateCubeUpToLeft()
+    time.sleep(1)
     rotateCubeUpToLeft()
     
 def Uprima_movement():
     rotateCubeUpToRight()
+    time.sleep(1)
     rotateCubeUpToRight()
     time.sleep(1)
     Dprima_movement()
     time.sleep(1)
     rotateCubeUpToLeft()
+    time.sleep(1)
     rotateCubeUpToLeft()
     
 def Udouble_movement():
     rotateCubeUpToRight()
+    time.sleep(1)
     rotateCubeUpToRight()
     time.sleep(1)
     D_movement()
     D_movement()
     time.sleep(1)
     rotateCubeUpToLeft()
+    time.sleep(1)
     rotateCubeUpToLeft()    
     
 def F_movement():
