@@ -476,14 +476,14 @@ def drawFace(str, draw, image):
     width=disp.width
     height=disp.height
     padding=-2
-    top=padding
+    top=padding-2
     x=0
     #font=ImageFont.load_default()
-    font = ImageFont.truetype('Minecraftia.ttf', 18)
+    font = ImageFont.truetype('Minecraftia.ttf', 12)
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
     draw.text((x+45, top), row1, font=font,  fill=255)
-    draw.text((x+45, top+20), row2, font=font,  fill=255)
-    draw.text((x+45, top+40), row3, font=font,  fill=255)
+    draw.text((x+45, top+14), row2, font=font,  fill=255)
+    draw.text((x+45, top+28), row3, font=font,  fill=255)
     disp.image(image)
     disp.display()
     time.sleep(.1)
@@ -743,6 +743,12 @@ obj = load_object("datacube.pickle")
 #time.sleep(10)
 #openGrips()
 # captureRubikFace()
+# cube = obj.cube
+# solution = utils.solve(cube, 'Kociemba')
+# print(solution)
+# 
+# strFaces = captureRubikFaces()
+# exit()
 
 while True:
     startValue= GPIO.input(startButton)
